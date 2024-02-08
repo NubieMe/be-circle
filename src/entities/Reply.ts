@@ -22,7 +22,7 @@ export class Reply {
     @ManyToOne(() => User, (user) => user.id, {
         cascade: true,
     })
-    user: User;
+    created_by: User;
 
     @Column({ default: () => "NOW()" })
     created_at: Date;

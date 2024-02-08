@@ -21,9 +21,10 @@ export class Thread {
     replies: Reply[];
 
     @ManyToOne(() => User, (user) => user.id, {
-        cascade: true,
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
     })
-    user: User;
+    created_by: User;
 
     @Column({ default: () => "NOW()" })
     created_at: Date;

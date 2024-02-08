@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
 import { Thread } from "./Thread";
+import { Reply } from "./Reply";
 
 @Entity()
 export class User {
@@ -24,12 +25,12 @@ export class User {
     @Column({ nullable: true })
     bio: string;
 
-    @OneToMany(() => Thread, (thread) => thread.user)
+    @OneToMany(() => Thread, (thread) => thread.created_by)
     threads: Thread[];
 
-    @ManyToOne(() => User, (user) => user.id)
-    follower: User[];
+    @OneToMany(() => Reply, (reply) => reply.created_by)
+    replies: Reply[];
 
-    @ManyToOne(() => User, (user) => user.id)
-    following: User[];
+    @Column({ default: () => "NOW()" })
+    created_at: Date;
 }
