@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { Schema } from "joi";
-import ResponseError from "../error/responseError";
+import ResponseError from "../../error/responseError";
 
 export const validate = (schema: Schema, request: Request) => {
     const result = schema.validate(request, {

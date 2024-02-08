@@ -1,8 +1,8 @@
 import { Repository } from "typeorm";
 import { User } from "../entities/User";
 import { AppDataSource } from "../data-source";
-import { validate } from "../utils/validation";
-import { loginSchema, registerSchema } from "../utils/authValidator";
+import { validate } from "../utils/validator/validation";
+import { loginSchema, registerSchema } from "../utils/validator/authValidator";
 import ResponseError from "../error/responseError";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
