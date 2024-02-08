@@ -1,6 +1,6 @@
 export default class ResponseError extends Error {
-    status;
-    constructor(status: number, message) {
+    status: number;
+    constructor(status: number, message: string) {
         super(message);
         this.status = status;
     }
