@@ -43,14 +43,14 @@ export default new (class AuthService {
         const chkUser = await this.authrepository.findOne({ where: { username: isValid.username } });
         if (!chkUser) throw new ResponseError(401, "Username not registered yet!");
 
-        const isMatch = await bcrypt.compare(isValid.password, chkUser.password);
-        if (!isMatch) throw new ResponseError(401, "Username or Password is not correct!");
+        const isEqual = await bcrypt.compare(isValid.password, chkUser.password);
+        if (!isEqual) throw new ResponseError(401, "Username or Password is not correct!");
 
         const token = jwt.sign({ id: chkUser.id, username: chkUser.username }, process.env.SECRET_KEY, {
             expiresIn: "7d",
         });
         return {
-            message: "Account created successfully",
+            message: "Login success",
             user: {
                 id: chkUser.id,
                 username: chkUser.username,
