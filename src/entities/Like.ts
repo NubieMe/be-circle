@@ -2,7 +2,7 @@ import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 import { Thread } from "./Thread";
 
-@Entity()
+@Entity({ name: "likes" })
 export class Like {
     @PrimaryGeneratedColumn()
     id: number;

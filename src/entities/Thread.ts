@@ -3,7 +3,7 @@ import { User } from "./User";
 import { Like } from "./Like";
 import { Reply } from "./Reply";
 
-@Entity()
+@Entity({ name: "threads" })
 export class Thread {
     @PrimaryGeneratedColumn()
     id: number;
@@ -28,4 +28,7 @@ export class Thread {
 
     @Column({ default: () => "NOW()" })
     created_at: Date;
+
+    @Column({ default: () => "NOW()" })
+    updated_at: Date;
 }

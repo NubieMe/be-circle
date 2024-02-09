@@ -2,18 +2,18 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "ty
 import { Thread } from "./Thread";
 import { Reply } from "./Reply";
 
-@Entity()
+@Entity({ name: "users" })
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ length: 100 })
     name: string;
 
-    @Column()
+    @Column({ length: 100 })
     username: string;
 
-    @Column()
+    @Column({ length: 255 })
     password: string;
 
     @Column({ nullable: true })
