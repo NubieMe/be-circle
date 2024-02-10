@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
 import { Thread } from "./Thread";
 import { Reply } from "./Reply";
+import { Follow } from "./Follow";
 
 @Entity({ name: "users" })
 export class User {
@@ -24,6 +25,9 @@ export class User {
 
     @Column({ nullable: true })
     bio: string;
+
+    @OneToMany(() => Follow, (follow) => follow.id)
+    follow: Follow;
 
     @OneToMany(() => Thread, (thread) => thread.created_by)
     threads: Thread[];
