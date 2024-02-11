@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { Thread } from "./Thread";
 import { Reply } from "./Reply";
+import { Like } from "./Like";
 import { Follow } from "./Follow";
 
 @Entity({ name: "users" })
@@ -26,13 +27,17 @@ export class User {
     @Column({ nullable: true })
     bio: string;
 
-    @OneToMany(() => Follow, (follow) => follow.id)
+    @OneToOne(() => Follow)
+    @JoinColumn()
     follow: Follow;
 
-    @OneToMany(() => Thread, (thread) => thread.created_by)
+    @OneToMany(() => Thread, (thread) => thread.author)
     threads: Thread[];
 
-    @OneToMany(() => Reply, (reply) => reply.created_by)
+    @OneToMany(() => Like, (like) => like.user_id)
+    likes: Like[];
+
+    @OneToMany(() => Reply, (reply) => reply.author)
     replies: Reply[];
 
     @Column({ default: () => "NOW()" })

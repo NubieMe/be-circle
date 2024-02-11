@@ -14,17 +14,21 @@ export class Thread {
     @Column({ nullable: true })
     image: string;
 
-    @OneToMany(() => Like, (like) => like.id)
+    @OneToMany(() => Like, (like) => like.id, {
+        eager: true,
+    })
     likes: Like[];
 
-    @OneToMany(() => Reply, (reply) => reply.id)
+    @OneToMany(() => Reply, (reply) => reply.id, {
+        eager: true,
+    })
     replies: Reply[];
 
     @ManyToOne(() => User, (user) => user.id, {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
     })
-    created_by: User;
+    author: User;
 
     @Column({ default: () => "NOW()" })
     created_at: Date;

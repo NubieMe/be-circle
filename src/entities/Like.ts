@@ -8,7 +8,7 @@ export class Like {
     id: number;
 
     @ManyToOne(() => Thread, (thread) => thread.id)
-    thread_id: Thread;
+    thread: Thread;
 
     @OneToMany(() => User, (user) => user.id)
     user_id: User;

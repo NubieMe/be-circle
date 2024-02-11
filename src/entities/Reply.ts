@@ -13,16 +13,18 @@ export class Reply {
     @Column({ nullable: true })
     image: string;
 
-    @OneToMany(() => Like, (like) => like.id)
+    @OneToMany(() => Like, (like) => like.id, {
+        eager: true,
+    })
     likes: Like[];
 
-    @OneToMany(() => Reply, (reply) => reply.id)
+    @OneToMany(() => Reply, (reply) => reply.id, {
+        eager: true,
+    })
     replies: Reply[];
 
-    @ManyToOne(() => User, (user) => user.id, {
-        cascade: true,
-    })
-    created_by: User;
+    @ManyToOne(() => User, (user) => user.id)
+    author: User;
 
     @Column({ default: () => "NOW()" })
     created_at: Date;
