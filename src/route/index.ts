@@ -19,13 +19,15 @@ routes.delete("/logout", authController.logout);
 routes.get("/search/:username", userController.getUsers);
 routes.get("/user/:username", userController.getUser);
 routes.get("/user/current", authMiddleware.auth, userController.getCurrent);
-routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userController.getUser);
-routes.delete("/user/:id", authMiddleware.auth, userController.getUser);
+routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userController.updateUser);
+routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
 
 //Thread API
 routes.post("/thread", uploadFile.upload("image"), threadController.createThread);
 routes.get("/thread", threadController.getThreads);
 routes.get("/thread/:id", threadController.getThread);
+routes.patch("/thread/:id", threadController.updateThread);
+routes.delete("/thread/:id", threadController.deleteThread);
 
 //Follow API
 routes.patch("/follow", authMiddleware.auth, followController.follow);
