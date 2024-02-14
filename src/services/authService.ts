@@ -45,7 +45,14 @@ export default new (class AuthService {
     async login(reqBody: Request) {
         const isValid = validate(loginSchema, reqBody);
 
-        const chkUser = await this.authRepository.findOne({ where: { username: isValid.username } });
+        const chkUser = await this.authRepository.findOne({
+            where: { username: isValid.username },
+            select: {
+                id: true,
+                username: true,
+                password: true,
+            },
+        });
         if (!chkUser) throw new ResponseError(401, "Username not registered yet!");
 
         const isEqual = await bcrypt.compare(isValid.password, chkUser.password);
