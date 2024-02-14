@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 import { Thread } from "./Thread";
 import { Reply } from "./Reply";
 import { Like } from "./Like";
@@ -22,19 +22,21 @@ export class User {
     picture: string;
 
     @Column({ nullable: true })
-    cover_photo: string;
+    cover: string;
 
     @Column({ nullable: true })
     bio: string;
 
-    @OneToOne(() => Follow)
-    @JoinColumn()
-    follow: Follow;
+    @OneToMany(() => Follow, (follow) => follow.follower)
+    follower: Follow[];
+
+    @OneToMany(() => Follow, (follow) => follow.following)
+    following: Follow[];
 
     @OneToMany(() => Thread, (thread) => thread.author)
     threads: Thread[];
 
-    @OneToMany(() => Like, (like) => like.user_id)
+    @OneToMany(() => Like, (like) => like.author)
     likes: Like[];
 
     @OneToMany(() => Reply, (reply) => reply.author)

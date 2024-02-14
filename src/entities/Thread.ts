@@ -8,25 +8,21 @@ export class Thread {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ length: 160 })
+    @Column({ length: 160, nullable: true })
     content: string;
 
     @Column({ nullable: true })
     image: string;
 
-    @OneToMany(() => Like, (like) => like.id, {
-        eager: true,
-    })
+    @OneToMany(() => Like, (like) => like.thread)
     likes: Like[];
 
-    @OneToMany(() => Reply, (reply) => reply.id, {
-        eager: true,
-    })
+    @OneToMany(() => Reply, (reply) => reply.reply)
     replies: Reply[];
 
     @ManyToOne(() => User, (user) => user.id, {
         onUpdate: "CASCADE",
-        onDelete: "SET NULL",
+        onDelete: "CASCADE",
     })
     author: User;
 

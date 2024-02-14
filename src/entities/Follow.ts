@@ -6,9 +6,18 @@ export class Follow {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.name)
-    follower: User[];
+    @ManyToOne(() => User, (user) => user.follower, {
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    follower: User;
 
-    @ManyToOne(() => User, (user) => user.name)
-    following: User[];
+    @ManyToOne(() => User, (user) => user.following, {
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+    })
+    following: User;
+
+    @OneToOne(() => User, (user) => user.id)
+    user: User;
 }
