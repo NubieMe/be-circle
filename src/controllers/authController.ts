@@ -21,11 +21,7 @@ export default new (class AuthController {
 
     async login(req: Request, res: Response) {
         try {
-            const data = {
-                username: req.query.username,
-                password: req.query.password,
-            };
-            const response = await authService.login(data);
+            const response = await authService.login(req.body);
 
             return res
                 .status(200)
@@ -42,9 +38,9 @@ export default new (class AuthController {
 
     async logout(req: Request, res: Response) {
         try {
-            return res.status(200).clearCookie("C.id").json({ message: "Logout successfully" });
+            return res.status(200).clearCookie("C.id").json({ message: "Logout success" });
         } catch (error) {
-            return res.status(error.status).json({ message: error.message });
+            return res.status(500).json({ message: "Internal Server Error" });
         }
     }
 })();
