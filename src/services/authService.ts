@@ -6,30 +6,34 @@ import { loginSchema, registerSchema } from "../utils/validator/authValidator";
 import ResponseError from "../error/responseError";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import { Request } from "express";
+import followService from "./followService";
 
 export default new (class AuthService {
-    private readonly authrepository: Repository<User> = AppDataSource.getRepository(User);
+    private readonly authRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async register(data) {
-        const isValid = validate(registerSchema, data);
+    async register(reqBody: Request) {
+        const isValid = validate(registerSchema, reqBody);
 
-        const chkUser = await this.authrepository.countBy({ username: isValid.username });
+        const chkUser = await this.authRepository.countBy({ username: isValid.username });
         if (chkUser !== 0) throw new ResponseError(400, "Username already exist!");
 
         const hash = await bcrypt.hash(isValid.password, 10);
-        const user = await this.authrepository.save({
+
+        await this.authRepository.save({
             username: isValid.username,
             password: hash,
             name: isValid.name,
         });
 
-        const get = await this.authrepository.findOne({ where: { username: isValid.username } });
+        const get = await this.authRepository.findOne({ where: { username: isValid.username } });
+        await followService.createFollow(get.id);
 
         const token = jwt.sign({ id: get.id, username: get.username }, process.env.SECRET_KEY, {
             expiresIn: "7d",
         });
         return {
-            message: "Account created successfully",
+            message: "Account created",
             user: {
                 id: get.id,
                 username: get.username,
@@ -38,9 +42,10 @@ export default new (class AuthService {
         };
     }
 
-    async login(data) {
-        const isValid = validate(loginSchema, data);
-        const chkUser = await this.authrepository.findOne({ where: { username: isValid.username } });
+    async login(reqBody: Request) {
+        const isValid = validate(loginSchema, reqBody);
+
+        const chkUser = await this.authRepository.findOne({ where: { username: isValid.username } });
         if (!chkUser) throw new ResponseError(401, "Username not registered yet!");
 
         const isEqual = await bcrypt.compare(isValid.password, chkUser.password);
