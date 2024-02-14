@@ -5,32 +5,49 @@ import ResponseError from "../error/responseError";
 import * as bcrypt from "bcrypt";
 
 export default new (class UserService {
-    private readonly userRepostory: Repository<User> = AppDataSource.getRepository(User);
+    private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async getUsers() {
-        return;
+    async getUsers(username) {
+        return this.userRepository.query(
+            `SELECT users.id, users.name, users.username, users.picture, users.bio FROM users WHERE name ILIKE '%${username}%' OR username ILIKE '%${username}%'`
+        );
     }
 
-    async getUser(id) {
-        return this.userRepostory
-            .createQueryBuilder("user")
-            .leftJoinAndSelect("user.threads", "threads")
-            .where("user.id = :id", id)
-            .select([
-                "user.id",
-                "user.username",
-                "user.fullName",
-                "user.address",
-                "user.gender",
-                "user.paslon",
-                "user.isAdmin",
-                "paslon.id",
-                "paslon.name",
-            ])
-            .getOne();
+    async getUser(username) {
+        return this.userRepository.findOne({
+            where: { username },
+            relations: {
+                threads: true,
+                follower: true,
+                following: true,
+                likes: true,
+                replies: true,
+            },
+            select: {
+                threads: true,
+                follower: true,
+                following: true,
+                likes: true,
+                replies: true,
+            },
+        });
     }
 
-    async update(id: number, data, session: number) {
+    async getCurrent(id) {
+        return this.userRepository.findOne({
+            where: { id },
+            relations: {
+                follower: true,
+                following: true,
+            },
+            select: {
+                follower: true,
+                following: true,
+            },
+        });
+    }
+
+    async updateUser(id: number, session: number, data) {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
         let user;
 
@@ -50,11 +67,23 @@ export default new (class UserService {
             };
         }
 
-        const response = await this.userRepostory.update(id, user);
-
+        await this.userRepository.update({ id }, user);
         return {
             message: "Account updated",
             user: data.username,
+        };
+    }
+
+    async deleteUser(id, session, password) {
+        if (session !== id) throw new ResponseError(403, "Cannot delete another user's Account");
+        const user = await this.userRepository.findOne({ where: { id }, select: password });
+
+        const isEqual = await bcrypt.compare(password, user.password);
+        if (!isEqual) throw new ResponseError(400, "Wrong password");
+
+        await this.userRepository.delete({ id });
+        return {
+            message: "Account deleted",
         };
     }
 })();
