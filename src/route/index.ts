@@ -6,6 +6,7 @@ import threadController from "../controllers/threadController";
 import authMiddleware from "../middlewares/auth";
 import uploadFile from "../middlewares/uploadFile";
 import followController from "../controllers/followController";
+import likeController from "../controllers/likeController";
 
 const routes = Router();
 const upload = multer();
@@ -18,7 +19,7 @@ routes.delete("/logout", authController.logout);
 //User API
 routes.get("/search/:username", userController.getUsers);
 routes.get("/user/:username", userController.getUser);
-routes.get("/user/current", authMiddleware.auth, userController.getCurrent);
+routes.get("/user/me/current", authMiddleware.auth, userController.getCurrent);
 routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userController.updateUser);
 routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
 
@@ -32,5 +33,9 @@ routes.delete("/thread/:id", threadController.deleteThread);
 //Follow API
 routes.patch("/follow", authMiddleware.auth, followController.follow);
 routes.get("/follow", authMiddleware.auth, followController.getFollow);
+
+//Like API
+routes.post("/like/thread", authMiddleware.auth, likeController.likeThread);
+routes.post("/like/reply", authMiddleware.auth, likeController.likeReply);
 
 export default routes;
