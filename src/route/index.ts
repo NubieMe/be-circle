@@ -24,11 +24,11 @@ routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userC
 routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
 
 //Thread API
-routes.post("/thread", uploadFile.upload("image"), threadController.createThread);
+routes.post("/thread", authMiddleware.auth, uploadFile.upload("image"), threadController.createThread);
 routes.get("/thread", threadController.getThreads);
 routes.get("/thread/:id", threadController.getThread);
-routes.patch("/thread/:id", threadController.updateThread);
-routes.delete("/thread/:id", threadController.deleteThread);
+routes.patch("/thread/:id", authMiddleware.auth, threadController.updateThread);
+routes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread);
 
 //Follow API
 routes.patch("/follow", authMiddleware.auth, followController.follow);

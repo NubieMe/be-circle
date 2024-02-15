@@ -29,13 +29,13 @@ export default new (class ThreadController {
             if (!req.file) {
                 data = {
                     content: req.body.content,
-                    author: req.body.author,
+                    author: res.locals.session.id,
                 };
             } else {
                 data = {
                     content: req.body.content,
                     image: req.file.filename,
-                    author: req.body.author,
+                    author: res.locals.session.id,
                 };
             }
             const response = await threadService.createThread(data);
@@ -53,13 +53,11 @@ export default new (class ThreadController {
             if (!req.file) {
                 data = {
                     content: req.body.content,
-                    created_by: req.body.created_by,
                 };
             } else {
                 data = {
                     content: req.body.content,
                     image: req.file.filename,
-                    created_by: req.body.created_by,
                 };
             }
             const response = await threadService.updateThread(req.params, data);
@@ -72,7 +70,7 @@ export default new (class ThreadController {
 
     async deleteThread(req: Request, res: Response) {
         try {
-            const response = await threadService.deleteThread(req.params);
+            const response = await threadService.deleteThread(req.params, res.locals.session.id);
 
             res.status(200).json();
         } catch (error) {

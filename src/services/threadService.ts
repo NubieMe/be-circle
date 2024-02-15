@@ -145,9 +145,11 @@ export default new (class ThreadService {
         };
     }
 
-    async deleteThread(id) {
-        const chkThread = await this.threadRepository.countBy(id);
-        if (chkThread === 0) throw new ResponseError(404, "Not Found");
+    async deleteThread(id, session) {
+        const chkThread = await this.threadRepository.findOne({ where: { id } });
+        if (!chkThread) throw new ResponseError(404, "Not Found");
+
+        if (session !== chkThread.author.id) throw new ResponseError(403, "Cannot delete another user's Thread");
 
         await this.threadRepository.delete(id);
         return {
