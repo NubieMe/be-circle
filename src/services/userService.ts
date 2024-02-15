@@ -7,10 +7,8 @@ import * as bcrypt from "bcrypt";
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async getUsers(username) {
-        return this.userRepository.query(
-            `SELECT users.id, users.name, users.username, users.picture, users.bio FROM users WHERE name ILIKE '%${username}%' OR username ILIKE '%${username}%'`
-        );
+    async getUsers() {
+        return this.userRepository.find();
     }
 
     async getUser(username) {
