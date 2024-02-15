@@ -11,4 +11,11 @@ export default new (class likeService {
             author: sessionId,
         });
     }
+
+    async likeReply(replyId, sessionId) {
+        return this.likeRepository.save({
+            reply: replyId,
+            author: sessionId,
+        });
+    }
 })();
