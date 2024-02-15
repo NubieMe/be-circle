@@ -2,7 +2,7 @@ import { Repository } from "typeorm";
 import { Like } from "../entities/Like";
 import { AppDataSource } from "../data-source";
 
-export default new (class likeService {
+export default new (class LikeService {
     private readonly likeRepository: Repository<Like> = AppDataSource.getRepository(Like);
 
     async likeThread(threadId, sessionId) {
