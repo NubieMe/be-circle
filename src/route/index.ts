@@ -27,7 +27,7 @@ routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
 routes.post("/thread", authMiddleware.auth, uploadFile.upload("image"), threadController.createThread);
 routes.get("/thread", threadController.getThreads);
 routes.get("/thread/:id", threadController.getThread);
-routes.patch("/thread/:id", authMiddleware.auth, threadController.updateThread);
+routes.patch("/thread/:id", authMiddleware.auth, uploadFile.upload("image"), threadController.updateThread);
 routes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread);
 
 //Follow API
@@ -37,5 +37,6 @@ routes.get("/follow", authMiddleware.auth, followController.getFollow);
 //Like API
 routes.post("/like/thread", authMiddleware.auth, likeController.likeThread);
 routes.post("/like/reply", authMiddleware.auth, likeController.likeReply);
+routes.delete("/unlike/:id", authMiddleware.auth, likeController.likeReply);
 
 export default routes;
