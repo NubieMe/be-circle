@@ -60,7 +60,7 @@ export default new (class ThreadController {
                     image: req.file.filename,
                 };
             }
-            const response = await threadService.updateThread(req.params, data);
+            const response = await threadService.updateThread(req.params, data, res.locals.session.id);
 
             res.status(200).json(response);
         } catch (error) {

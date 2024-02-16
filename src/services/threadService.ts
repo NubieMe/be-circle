@@ -5,12 +5,14 @@ import { validate } from "../utils/validator/validation";
 import { createThreadSchema, updateThreadSchema } from "../utils/validator/threadValidator";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
+import { Like } from "../entities/Like";
+import likeService from "./likeService";
 
 export default new (class ThreadService {
     private readonly threadRepository: Repository<Thread> = AppDataSource.getRepository(Thread);
 
     async getThreads() {
-        return this.threadRepository.find({
+        const response = await this.threadRepository.find({
             relations: {
                 author: true,
                 likes: true,
@@ -30,10 +32,42 @@ export default new (class ThreadService {
                 },
             },
         });
+
+        const likes = [];
+        let i = 0;
+        const reslen = response.length;
+        const like = response.map(async (val) => await likeService.getLikeThread(val.id));
+        console.log(await Promise.all(like));
+
+        for (i; i < reslen; i++) {
+            likes.push(
+                await Promise.all(
+                    response[i].likes.map(
+                        async (like) =>
+                            await AppDataSource.getRepository(Like).findOne({
+                                where: { id: like.id },
+                                relations: {
+                                    author: true,
+                                },
+                                select: {
+                                    author: {
+                                        id: true,
+                                    },
+                                },
+                            })
+                    )
+                )
+            );
+        }
+
+        return {
+            threads: response,
+            likes: likes,
+        };
     }
 
     async getThread(id) {
-        return this.threadRepository.findOne({
+        const response = await this.threadRepository.findOne({
             where: id,
             relations: {
                 author: true,
@@ -68,6 +102,30 @@ export default new (class ThreadService {
                 },
             },
         });
+
+        const likes = response.likes.map(
+            async (like) =>
+                await AppDataSource.getRepository(Like).findOne({
+                    where: { id: like.id },
+                    relations: {
+                        author: true,
+                    },
+                    select: {
+                        author: {
+                            id: true,
+                        },
+                    },
+                })
+        );
+
+        return {
+            id: response.id,
+            content: response.content,
+            image: response.image,
+            author: response.author,
+            likes: await Promise.all(likes),
+            replies: response.replies,
+        };
     }
 
     async createThread(data) {
@@ -107,7 +165,15 @@ export default new (class ThreadService {
         };
     }
 
-    async updateThread(id, data) {
+    async updateThread(id, data, session) {
+        const chkThread = await this.threadRepository.findOne({
+            where: id,
+            relations: {
+                author: true,
+            },
+        });
+        if (chkThread.author.id !== session) throw new ResponseError(403, "You are not the author of this thread");
+
         const isValid = validate(updateThreadSchema, data);
         let valid;
 
@@ -146,7 +212,7 @@ export default new (class ThreadService {
     }
 
     async deleteThread(id, session) {
-        const chkThread = await this.threadRepository.findOne({ where: { id } });
+        const chkThread = await this.threadRepository.findOne({ where: id, relations: { author: true } });
         if (!chkThread) throw new ResponseError(404, "Not Found");
 
         if (session !== chkThread.author.id) throw new ResponseError(403, "Cannot delete another user's Thread");
