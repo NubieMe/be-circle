@@ -7,6 +7,7 @@ import authMiddleware from "../middlewares/auth";
 import uploadFile from "../middlewares/uploadFile";
 import followController from "../controllers/followController";
 import likeController from "../controllers/likeController";
+import replyController from "../controllers/replyController";
 
 const routes = Router();
 const upload = multer();
@@ -37,6 +38,9 @@ routes.get("/follow", authMiddleware.auth, followController.getFollow);
 //Like API
 routes.post("/like/thread", authMiddleware.auth, likeController.likeThread);
 routes.post("/like/reply", authMiddleware.auth, likeController.likeReply);
-routes.delete("/unlike/:id", authMiddleware.auth, likeController.likeReply);
+routes.delete("/unlike/:id", authMiddleware.auth, likeController.unlike);
 
+//Reply API
+routes.post("/reply/thread", authMiddleware.auth, uploadFile.upload("image"), replyController.replyThread);
+routes.post("/reply/reply", authMiddleware.auth, uploadFile.upload("image"), replyController.repliesReply);
 export default routes;
