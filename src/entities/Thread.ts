@@ -29,6 +29,6 @@ export class Thread {
     @Column({ default: () => "NOW()" })
     created_at: Date;
 
-    @Column({ default: () => "NOW()" })
+    @Column({ nullable: true })
     updated_at: Date;
 }
