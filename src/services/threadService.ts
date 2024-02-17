@@ -2,17 +2,20 @@ import { Repository } from "typeorm";
 import { Thread } from "../entities/Thread";
 import { AppDataSource } from "../data-source";
 import { validate } from "../utils/validator/validation";
-import { createThreadSchema, updateThreadSchema } from "../utils/validator/threadValidator";
+import { createThreadSchema, updateThreadSchema } from "../utils/validator/thread";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
-import { Like } from "../entities/Like";
 import likeService from "./likeService";
+import replyService from "./replyService";
 
 export default new (class ThreadService {
     private readonly threadRepository: Repository<Thread> = AppDataSource.getRepository(Thread);
 
-    async getThreads() {
+    async getThreads(id) {
         const response = await this.threadRepository.find({
+            order: {
+                id: "DESC",
+            },
             relations: {
                 author: true,
                 likes: true,
@@ -20,53 +23,36 @@ export default new (class ThreadService {
             },
             select: {
                 author: {
+                    id: true,
                     name: true,
                     username: true,
                     picture: true,
                 },
-                likes: {
-                    id: true,
-                },
-                replies: {
-                    id: true,
-                },
             },
         });
+        const likes = response.map(async (val) => await likeService.getLikeThread(val.id, id));
 
-        const likes = [];
+        const threads = [];
         let i = 0;
-        const reslen = response.length;
-        const like = response.map(async (val) => await likeService.getLikeThread(val.id));
-        console.log(await Promise.all(like));
-
-        for (i; i < reslen; i++) {
-            likes.push(
-                await Promise.all(
-                    response[i].likes.map(
-                        async (like) =>
-                            await AppDataSource.getRepository(Like).findOne({
-                                where: { id: like.id },
-                                relations: {
-                                    author: true,
-                                },
-                                select: {
-                                    author: {
-                                        id: true,
-                                    },
-                                },
-                            })
-                    )
-                )
-            );
+        const len = response.length;
+        for (i; i < len; i++) {
+            threads.push({
+                id: response[i].id,
+                content: response[i].content,
+                image: response[i].image,
+                likes: response[i].likes.length,
+                isLiked: await likes[i],
+                replies: response[i].replies.length,
+                author: response[i].author,
+                created_at: response[i].created_at,
+                updated_at: response[i].updated_at,
+            });
         }
 
-        return {
-            threads: response,
-            likes: likes,
-        };
+        return await Promise.all(threads);
     }
 
-    async getThread(id) {
+    async getThread(id, userId) {
         const response = await this.threadRepository.findOne({
             where: id,
             relations: {
@@ -76,55 +62,26 @@ export default new (class ThreadService {
             },
             select: {
                 author: {
+                    id: true,
                     name: true,
                     username: true,
                     picture: true,
                 },
-                likes: {
-                    id: true,
-                },
-                replies: {
-                    id: true,
-                    content: true,
-                    image: true,
-                    likes: {
-                        id: true,
-                    },
-                    replies: {
-                        id: true,
-                    },
-                    author: {
-                        name: true,
-                        username: true,
-                        picture: true,
-                    },
-                    created_at: true,
-                },
             },
         });
 
-        const likes = response.likes.map(
-            async (like) =>
-                await AppDataSource.getRepository(Like).findOne({
-                    where: { id: like.id },
-                    relations: {
-                        author: true,
-                    },
-                    select: {
-                        author: {
-                            id: true,
-                        },
-                    },
-                })
-        );
-
+        const like = await likeService.getLikeThread(response.id, userId);
+        const replies = await replyService.getRepliesThread(response.id);
         return {
             id: response.id,
             content: response.content,
             image: response.image,
             author: response.author,
-            likes: await Promise.all(likes),
-            replies: response.replies,
+            likes: response.likes.length,
+            isLiked: like,
+            replies,
+            created_at: response.created_at,
+            updated_at: response.updated_at,
         };
     }
 
@@ -134,11 +91,11 @@ export default new (class ThreadService {
 
         if (data.image && data.content) {
             cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.destination(isValid.image);
 
             valid = {
                 content: isValid.content,
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 author: isValid.author,
             };
         } else if (!data.image && data.content) {
@@ -148,10 +105,10 @@ export default new (class ThreadService {
             };
         } else if (data.image && !data.content) {
             cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.destination(isValid.image);
 
             valid = {
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 author: isValid.author,
             };
         } else {
@@ -179,11 +136,11 @@ export default new (class ThreadService {
 
         if (data.image && data.content) {
             cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.destination(isValid.image);
 
             valid = {
                 content: isValid.content,
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 updated_at: isValid.updated_at,
             };
         } else if (!data.image && data.content) {
@@ -193,10 +150,10 @@ export default new (class ThreadService {
             };
         } else if (data.image && !data.content) {
             cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.destination(isValid.image);
 
             valid = {
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 updated_at: isValid.updated_at,
             };
         } else {

@@ -4,7 +4,7 @@ import threadService from "../services/threadService";
 export default new (class ThreadController {
     async getThreads(req: Request, res: Response) {
         try {
-            const response = await threadService.getThreads();
+            const response = await threadService.getThreads(req.query.id);
 
             res.status(200).json(response);
         } catch (error) {
@@ -14,7 +14,7 @@ export default new (class ThreadController {
 
     async getThread(req: Request, res: Response) {
         try {
-            const response = await threadService.getThread(req.params);
+            const response = await threadService.getThread(req.params, req.query.id);
 
             res.status(200).json(response);
         } catch (error) {
