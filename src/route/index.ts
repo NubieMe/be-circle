@@ -22,6 +22,8 @@ routes.get("/search", userController.getUsers);
 routes.get("/user/:username", userController.getUser);
 routes.get("/user/me/current", authMiddleware.auth, userController.getCurrent);
 routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userController.updateUser);
+routes.patch("/upload/picture/:id", authMiddleware.auth, uploadFile.upload("image"), userController.uploadPicture);
+routes.patch("/upload/cover/:id", authMiddleware.auth, uploadFile.upload("image"), userController.uploadCover);
 routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
 
 //Thread API

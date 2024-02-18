@@ -72,6 +72,22 @@ export default new (class UserService {
         };
     }
 
+    async uploadPicture(id, session, picture) {
+        if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
+        await this.userRepository.update({ id }, { picture });
+        return {
+            message: "Picture uploaded",
+        };
+    }
+
+    async uploadCover(id, session, cover) {
+        if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
+        await this.userRepository.update({ id }, { cover });
+        return {
+            message: "Cover uploaded",
+        };
+    }
+
     async deleteUser(id, session, password) {
         if (session !== id) throw new ResponseError(403, "Cannot delete another user's Account");
         const user = await this.userRepository.findOne({ where: { id }, select: password });

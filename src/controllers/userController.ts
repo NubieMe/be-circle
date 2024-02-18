@@ -41,6 +41,32 @@ export default new (class UserController {
         }
     }
 
+    async uploadPicture(req: Request, res: Response) {
+        try {
+            const response = await userService.uploadPicture(
+                parseInt(req.params.id),
+                res.locals.session.id,
+                req.file.filename
+            );
+            res.status(200).json(response);
+        } catch (error) {
+            res.status(error.status).json({ message: error.message });
+        }
+    }
+
+    async uploadCover(req: Request, res: Response) {
+        try {
+            const response = await userService.uploadCover(
+                parseInt(req.params.id),
+                res.locals.session.id,
+                req.file.filename
+            );
+            res.status(200).json(response);
+        } catch (error) {
+            res.status(error.status).json({ message: error.message });
+        }
+    }
+
     async deleteUser(req: Request, res: Response) {
         try {
             const response = await userService.deleteUser(
