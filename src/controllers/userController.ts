@@ -14,7 +14,7 @@ export default new (class UserController {
 
     async getUser(req: Request, res: Response) {
         try {
-            const response = await userService.getUser(req.params.username);
+            const response = await userService.getUser(req.params.id);
 
             res.status(200).json(response);
         } catch (error) {
