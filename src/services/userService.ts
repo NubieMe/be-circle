@@ -11,9 +11,9 @@ export default new (class UserService {
         return this.userRepository.find();
     }
 
-    async getUser(username) {
+    async getUser(id) {
         return this.userRepository.findOne({
-            where: { username },
+            where: { id },
             relations: {
                 threads: true,
                 follower: true,
