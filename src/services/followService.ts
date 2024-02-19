@@ -1,7 +1,6 @@
 import { Equal, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { Follow } from "../entities/Follow";
-import { Request } from "express";
 import { User } from "../entities/User";
 
 export default new (class FollowService {
