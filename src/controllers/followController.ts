@@ -14,7 +14,7 @@ export default new (class FollowController {
 
     async follow(req: Request, res: Response) {
         try {
-            const response = await followService.follow(req.body, res.locals.session.id);
+            const response = await followService.follow(req.body.following, res.locals.session.id);
 
             res.status(200).json(response);
         } catch (error) {
@@ -22,11 +22,13 @@ export default new (class FollowController {
         }
     }
 
-    // async unfollow() {
-    //     try {
+    async unfollow(req: Request, res: Response) {
+        try {
+            const response = await followService.unfollow(req.query.following, res.locals.session.id);
 
-    //     } catch (error) {
-    //         res.status(500).json({message: 'internal server error'})
-    //     }
-    // }
+            res.status(200).json(response);
+        } catch (error) {
+            res.status(500).json({ message: "internal server error" });
+        }
+    }
 })();
