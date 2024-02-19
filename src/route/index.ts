@@ -19,7 +19,7 @@ routes.delete("/logout", authController.logout);
 
 //User API
 routes.get("/search", userController.getUsers);
-routes.get("/user/:username", userController.getUser);
+routes.get("/user/:id", userController.getUser);
 routes.get("/user/me/current", authMiddleware.auth, userController.getCurrent);
 routes.patch("/user/:id", authMiddleware.auth, uploadFile.upload("image"), userController.updateUser);
 routes.patch("/upload/picture/:id", authMiddleware.auth, uploadFile.upload("image"), userController.uploadPicture);
@@ -34,8 +34,9 @@ routes.patch("/thread/:id", authMiddleware.auth, uploadFile.upload("image"), thr
 routes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread);
 
 //Follow API
-routes.patch("/follow", authMiddleware.auth, followController.follow);
+routes.post("/follow", authMiddleware.auth, followController.follow);
 routes.get("/follow", authMiddleware.auth, followController.getFollow);
+routes.delete("/unfollow", authMiddleware.auth, followController.unfollow);
 
 //Like API
 routes.post("/like/thread", authMiddleware.auth, likeController.likeThread);
@@ -46,5 +47,6 @@ routes.delete("/unlike/reply", authMiddleware.auth, likeController.unlikeReply);
 //Reply API
 routes.post("/reply/thread", authMiddleware.auth, uploadFile.upload("image"), replyController.replyThread);
 routes.post("/reply/reply", authMiddleware.auth, uploadFile.upload("image"), replyController.repliesReply);
+routes.delete("/reply/:id", authMiddleware.auth, replyController.deleteReply);
 
 export default routes;
