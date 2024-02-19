@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 
 @Entity({ name: "follows" })
@@ -17,7 +17,4 @@ export class Follow {
         onDelete: "CASCADE",
     })
     following: User;
-
-    @OneToOne(() => User, (user) => user.id)
-    user: User;
 }
