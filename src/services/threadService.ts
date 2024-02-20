@@ -71,7 +71,7 @@ export default new (class ThreadService {
         });
 
         const like = await likeService.getLikeThread(response.id, userId);
-        const replies = await replyService.getRepliesThread(response.id);
+        const replies = await replyService.getRepliesThread(response.id, userId);
         return {
             id: response.id,
             content: response.content,
