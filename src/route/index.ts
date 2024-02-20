@@ -35,7 +35,7 @@ routes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread)
 
 //Follow API
 routes.post("/follow", authMiddleware.auth, followController.follow);
-routes.get("/follow", authMiddleware.auth, followController.getFollow);
+routes.get("/follow/:id", followController.getFollow);
 routes.delete("/unfollow", authMiddleware.auth, followController.unfollow);
 
 //Like API
@@ -46,7 +46,6 @@ routes.delete("/unlike/reply", authMiddleware.auth, likeController.unlikeReply);
 
 //Reply API
 routes.post("/reply/thread", authMiddleware.auth, uploadFile.upload("image"), replyController.replyThread);
-routes.post("/reply/reply", authMiddleware.auth, uploadFile.upload("image"), replyController.repliesReply);
 routes.delete("/reply/:id", authMiddleware.auth, replyController.deleteReply);
 
 export default routes;
