@@ -4,7 +4,7 @@ import { AppDataSource } from "../data-source";
 import { validate } from "../utils/validator/validation";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
-import { repliesReplySchema, replyThreadSchema } from "../utils/validator/reply";
+import { replyThreadSchema } from "../utils/validator/reply";
 import likeService from "./likeService";
 
 export default new (class ReplyService {

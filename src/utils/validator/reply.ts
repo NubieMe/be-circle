@@ -6,16 +6,3 @@ export const replyThreadSchema = joi.object({
     thread: joi.number().required(),
     author: joi.number().required(),
 });
-
-export const repliesReplySchema = joi.object({
-    content: joi.string().max(160).optional(),
-    image: joi.string().optional(),
-    reply: joi.number().required(),
-    author: joi.number().required(),
-});
-
-export const updateThreadSchema = joi.object({
-    content: joi.string().max(160).optional(),
-    image: joi.string().optional(),
-    updated_at: joi.date().default(new Date()),
-});
