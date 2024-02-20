@@ -39,7 +39,7 @@ export default new (class LikeService {
     async getLikeReply(replyId, authorId) {
         const chk = await this.likeRepository
             .createQueryBuilder("like")
-            .where("like.thread = :thread", { reply: replyId })
+            .where("like.reply = :reply", { reply: replyId })
             .andWhere("like.author = :author", { author: authorId })
             .getOne();
 
