@@ -11,8 +11,8 @@ export class Thread {
     @Column({ length: 160, nullable: true })
     content: string;
 
-    @Column({ nullable: true })
-    image: string;
+    @Column({ nullable: true, type: String, array: true })
+    image: string[];
 
     @OneToMany(() => Like, (like) => like.thread)
     likes: Like[];
