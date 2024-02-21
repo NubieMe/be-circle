@@ -90,12 +90,12 @@ export default new (class ThreadService {
         let valid;
 
         if (data.image && data.content) {
-            cloudinary.upload();
-            const upFile = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.uploads(isValid.image);
+            // console.log(data.image);
 
             valid = {
                 content: isValid.content,
-                image: upFile.secure_url,
+                image: upFile,
                 author: isValid.author,
             };
         } else if (!data.image && data.content) {
@@ -104,11 +104,10 @@ export default new (class ThreadService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
-            cloudinary.upload();
-            const upFile = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
-                image: upFile.secure_url,
+                image: upFile,
                 author: isValid.author,
             };
         } else {
@@ -135,12 +134,11 @@ export default new (class ThreadService {
         let valid;
 
         if (data.image && data.content) {
-            cloudinary.upload();
-            const upFile = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
                 content: isValid.content,
-                image: upFile.secure_url,
+                image: upFile,
                 updated_at: isValid.updated_at,
             };
         } else if (!data.image && data.content) {
@@ -149,11 +147,10 @@ export default new (class ThreadService {
                 updated_at: isValid.updated_at,
             };
         } else if (data.image && !data.content) {
-            cloudinary.upload();
-            const upFile = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
-                image: upFile.secure_url,
+                image: upFile,
                 updated_at: isValid.updated_at,
             };
         } else {
@@ -173,7 +170,7 @@ export default new (class ThreadService {
         if (!chkThread) throw new ResponseError(404, "Not Found");
 
         if (session !== chkThread.author.id) throw new ResponseError(403, "Cannot delete another user's Thread");
-
+        cloudinary.deletes(chkThread.image);
         await this.threadRepository.delete(id);
         return {
             message: "Thread deleted",

@@ -44,12 +44,11 @@ export default new (class ReplyService {
         let valid;
 
         if (data.image && data.content) {
-            cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.upload(isValid.image);
 
             valid = {
                 content: isValid.content,
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 thread: isValid.thread,
                 author: isValid.author,
             };
@@ -60,11 +59,10 @@ export default new (class ReplyService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
-            cloudinary.upload();
-            const upFIle = await cloudinary.destination(isValid.image);
+            const upFile = await cloudinary.upload(isValid.image);
 
             valid = {
-                image: upFIle.secure_url,
+                image: upFile.secure_url,
                 thread: isValid.thread,
                 author: isValid.author,
             };
@@ -85,6 +83,7 @@ export default new (class ReplyService {
         if (!chkReply) throw new ResponseError(404, "Reply not found");
         if (session !== chkReply.author.id) throw new ResponseError(403, "You are not the author of this reply");
 
+        cloudinary.delete(chkReply.image);
         await this.replyRepository.delete(id);
         return {
             message: "Reply deleted",

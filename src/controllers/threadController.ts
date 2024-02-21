@@ -18,7 +18,7 @@ export default new (class ThreadController {
 
             res.status(200).json(response);
         } catch (error) {
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(500).json({ message: error.message });
         }
     }
 
@@ -26,7 +26,7 @@ export default new (class ThreadController {
         try {
             let data;
 
-            if (!req.file) {
+            if (!req.files) {
                 data = {
                     content: req.body.content,
                     author: res.locals.session.id,
@@ -34,7 +34,7 @@ export default new (class ThreadController {
             } else {
                 data = {
                     content: req.body.content,
-                    image: req.file.filename,
+                    image: req.files,
                     author: res.locals.session.id,
                 };
             }
