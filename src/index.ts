@@ -3,6 +3,7 @@ import * as express from "express";
 import * as cors from "cors";
 import routes from "./route";
 import "dotenv/config";
+import cloudinary from "./libs/cloudinary";
 
 AppDataSource.initialize()
     .then(async () => {
@@ -18,6 +19,7 @@ AppDataSource.initialize()
             })
         );
         app.use(express.json());
+        cloudinary.config();
         app.use("/api/v1", routes);
 
         app.listen(process.env.PORT, () => console.log(`Server is running!`));
