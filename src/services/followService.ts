@@ -33,8 +33,15 @@ export default new (class FollowService {
         };
     }
 
-    async unfollow(following, follower) {
-        await this.followRepository.delete({ following, follower });
+    async unfollow(follower, following) {
+        const getFollow = await this.followRepository.findOne({
+            where: { following: Equal(following), follower: Equal(follower) },
+            relations: {
+                following: true,
+                follower: true,
+            },
+        });
+        await this.followRepository.delete(getFollow.id);
         return {
             message: "Unfollow success",
         };
