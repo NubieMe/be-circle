@@ -1,19 +1,23 @@
-import { Repository } from "typeorm";
+import { Equal, Repository } from "typeorm";
 import { User } from "../entities/User";
 import { AppDataSource } from "../data-source";
 import ResponseError from "../error/responseError";
 import * as bcrypt from "bcrypt";
+import threadService from "./threadService";
+import { Follow } from "../entities/Follow";
 
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async getUsers() {
-        return this.userRepository.find();
+    async getUsers(name) {
+        return this.userRepository.query(
+            `SELECT * FROM users WHERE name ILIKE '%${name}%' OR username ILIKE '%${name}%';`
+        );
     }
 
-    async getUser(id) {
-        return this.userRepository.findOne({
-            where: { id },
+    async getUser(username) {
+        const response = await this.userRepository.findOne({
+            where: { username },
             relations: {
                 threads: true,
                 follower: true,
@@ -29,20 +33,55 @@ export default new (class UserService {
                 replies: true,
             },
         });
+        const threads = response.threads.map(async (val) => await threadService.getThread(val.id, response.id));
+
+        return {
+            id: response.id,
+            name: response.name,
+            username: response.username,
+            bio: response.bio,
+            picture: response.picture,
+            cover: response.cover,
+            follower: response.follower,
+            following: response.following,
+            threads: await Promise.all(threads),
+            created_at: response.created_at,
+        };
     }
 
     async getCurrent(id) {
-        return this.userRepository.findOne({
+        const response = await this.userRepository.findOne({
             where: { id },
             relations: {
                 follower: true,
                 following: true,
             },
-            select: {
-                follower: true,
+        });
+
+        const follower = await AppDataSource.getRepository(Follow).find({
+            where: { follower: Equal(id) },
+            relations: {
                 following: true,
             },
         });
+
+        const following = await AppDataSource.getRepository(Follow).find({
+            where: { following: Equal(id) },
+            relations: {
+                follower: true,
+            },
+        });
+
+        return {
+            id: response.id,
+            name: response.name,
+            username: response.username,
+            picture: response.picture,
+            cover: response.cover,
+            bio: response.bio,
+            follower,
+            following,
+        };
     }
 
     async updateUser(id: number, session: number, data) {
