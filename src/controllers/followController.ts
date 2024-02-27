@@ -18,7 +18,7 @@ export default new (class FollowController {
 
             res.status(200).json(response);
         } catch (error) {
-            res.status(500).json({ message: "Intenal Server Error" });
+            res.status(500).json({ message: error.message });
         }
     }
 
