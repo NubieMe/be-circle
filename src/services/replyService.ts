@@ -44,6 +44,7 @@ export default new (class ReplyService {
         let valid;
 
         if (data.image && data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.upload(isValid.image);
 
             valid = {
@@ -59,6 +60,7 @@ export default new (class ReplyService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.upload(isValid.image);
 
             valid = {

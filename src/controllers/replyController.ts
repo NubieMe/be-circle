@@ -5,7 +5,7 @@ export default new (class ReplyController {
     async replyThread(req: Request, res: Response) {
         try {
             let data;
-            if (!req.file) {
+            if (!req.files[0]) {
                 data = {
                     content: req.body.content,
                     thread: req.body.thread,
@@ -14,7 +14,7 @@ export default new (class ReplyController {
             } else {
                 data = {
                     content: req.body.content,
-                    image: req.file.filename,
+                    image: req.files[0].filename,
                     thread: req.body.thread,
                     author: res.locals.session.id,
                 };
