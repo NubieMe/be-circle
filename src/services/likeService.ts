@@ -1,12 +1,20 @@
-import { Repository } from "typeorm";
+import { Equal, Repository } from "typeorm";
 import { Like } from "../entities/Like";
 import { AppDataSource } from "../data-source";
+import ResponseError from "../error/responseError";
 
 export default new (class LikeService {
     private readonly likeRepository: Repository<Like> = AppDataSource.getRepository(Like);
 
     async likeThread(threadId, sessionId) {
-        const response = await this.likeRepository.save({
+        const check = await this.likeRepository.count({
+            where: {
+                thread: Equal(threadId),
+                author: Equal(sessionId),
+            },
+        });
+        if (check) throw new ResponseError(400, "You cannot like this Thread twice!");
+        await this.likeRepository.save({
             thread: threadId,
             author: sessionId,
         });
@@ -16,7 +24,14 @@ export default new (class LikeService {
     }
 
     async likeReply(replyId, sessionId) {
-        this.likeRepository.save({
+        const check = await this.likeRepository.count({
+            where: {
+                reply: Equal(replyId),
+                author: Equal(sessionId),
+            },
+        });
+        if (check) throw new ResponseError(400, "You cannot like this Reply twice!");
+        await this.likeRepository.save({
             reply: replyId,
             author: sessionId,
         });
@@ -55,6 +70,7 @@ export default new (class LikeService {
             .where("like.thread = :thread", { thread: id })
             .andWhere("like.author = :author", { author: session })
             .getOne();
+        if (!getLike) throw new ResponseError(404, "You already unlike this Thread");
 
         await this.likeRepository.delete(getLike.id);
         return {
@@ -70,6 +86,7 @@ export default new (class LikeService {
             .where("like.reply = :reply", { reply: id })
             .andWhere("like.author = :author", { author: session })
             .getOne();
+        if (!getLike) throw new ResponseError(404, "You already unlike this Reply");
 
         await this.likeRepository.delete(getLike.id);
         return {
