@@ -7,7 +7,7 @@ import ResponseError from "../error/responseError";
 export default new (class FollowService {
     private readonly followRepository: Repository<Follow> = AppDataSource.getRepository(Follow);
 
-    async getFollow(id) {
+    async getFollows(id) {
         const follower = await AppDataSource.getRepository(User).find({
             where: { following: { follower: Equal(id) } },
             relations: {
@@ -20,11 +20,38 @@ export default new (class FollowService {
                 follower: true,
             },
         });
+        const wer = await Promise.all(
+            follower.map(async (val) => {
+                const isFollow = await this.getFollow(val.id, id);
+
+                return {
+                    ...val,
+                    isFollow,
+                };
+            })
+        );
+        const wing = following.map((val) => {
+            return {
+                ...val,
+                isFollow: true,
+            };
+        });
 
         return {
-            follower,
-            following,
+            follower: wer,
+            following: wing,
         };
+    }
+
+    async getFollow(follower, following) {
+        const check = await this.followRepository.count({
+            where: {
+                following: Equal(following),
+                follower: Equal(follower),
+            },
+        });
+        if (check !== 0) return true;
+        return false;
     }
 
     async follow(follower, following) {
