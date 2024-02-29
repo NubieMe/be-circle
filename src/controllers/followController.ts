@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import followService from "../services/followService";
 
 export default new (class FollowController {
-    async getFollow(req: Request, res: Response) {
+    async getFollows(req: Request, res: Response) {
         try {
-            const response = await followService.getFollow(req.params.id);
+            const response = await followService.getFollows(req.params.id);
 
             res.status(200).json(response);
         } catch (error) {
