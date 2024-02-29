@@ -4,7 +4,7 @@ import userService from "../services/userService";
 export default new (class UserController {
     async getUsers(req: Request, res: Response) {
         try {
-            const response = await userService.getUsers(req.query.name);
+            const response = await userService.getUsers(req.query.name, res.locals.session.id);
 
             res.status(200).json(response);
         } catch (error) {

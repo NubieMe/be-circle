@@ -6,13 +6,24 @@ import * as bcrypt from "bcrypt";
 import threadService from "./threadService";
 import { Follow } from "../entities/Follow";
 import cloudinary from "../libs/cloudinary";
+import followService from "./followService";
 
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async getUsers(name) {
-        return this.userRepository.query(
+    async getUsers(name, id) {
+        const response = await this.userRepository.query(
             `SELECT * FROM users WHERE name ILIKE '%${name}%' OR username ILIKE '%${name}%';`
+        );
+        return await Promise.all(
+            response.map(async (val) => {
+                const follow = await followService.getFollow(val.id, id);
+
+                return {
+                    ...val,
+                    isFollow: follow,
+                };
+            })
         );
     }
 
