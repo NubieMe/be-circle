@@ -46,7 +46,7 @@ export default new (class UserController {
             const response = await userService.uploadPicture(
                 parseInt(req.params.id),
                 res.locals.session.id,
-                req.file.filename
+                req.files[0].filename
             );
             res.status(200).json(response);
         } catch (error) {
@@ -59,8 +59,17 @@ export default new (class UserController {
             const response = await userService.uploadCover(
                 parseInt(req.params.id),
                 res.locals.session.id,
-                req.file.filename
+                req.files[0].filename
             );
+            res.status(200).json(response);
+        } catch (error) {
+            res.status(error.status).json({ message: error.message });
+        }
+    }
+
+    async suggestion(req: Request, res: Response) {
+        try {
+            const response = await userService.suggestion(Number(req.query.id));
             res.status(200).json(response);
         } catch (error) {
             res.status(error.status).json({ message: error.message });

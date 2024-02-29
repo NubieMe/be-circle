@@ -1,10 +1,11 @@
-import { Equal, Repository } from "typeorm";
+import { Equal, In, Not, Repository } from "typeorm";
 import { User } from "../entities/User";
 import { AppDataSource } from "../data-source";
 import ResponseError from "../error/responseError";
 import * as bcrypt from "bcrypt";
 import threadService from "./threadService";
 import { Follow } from "../entities/Follow";
+import cloudinary from "../libs/cloudinary";
 
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
@@ -33,7 +34,10 @@ export default new (class UserService {
                 replies: true,
             },
         });
-        const threads = response.threads.map(async (val) => await threadService.getThread(val.id, response.id));
+        const threads = response.threads
+            .slice(0)
+            .reverse()
+            .map(async (val) => await threadService.getThread(val.id, response.id));
 
         return {
             id: response.id,
@@ -113,7 +117,12 @@ export default new (class UserService {
 
     async uploadPicture(id, session, picture) {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
-        await this.userRepository.update({ id }, { picture });
+        if (!picture) throw new ResponseError(400, "Picture is required");
+
+        cloudinary.config();
+        const upload = (await cloudinary.upload(picture)).secure_url;
+
+        await this.userRepository.update({ id }, { picture: upload });
         return {
             message: "Picture uploaded",
         };
@@ -121,10 +130,37 @@ export default new (class UserService {
 
     async uploadCover(id, session, cover) {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
-        await this.userRepository.update({ id }, { cover });
+        if (!cover) throw new ResponseError(400, "Cover image is required");
+
+        cloudinary.config();
+        const upload = (await cloudinary.upload(cover)).secure_url;
+
+        await this.userRepository.update({ id }, { cover: upload });
         return {
             message: "Cover uploaded",
         };
+    }
+
+    async suggestion(id: number) {
+        const following = await this.userRepository.find({
+            where: { follower: { following: Equal(id) } },
+            select: { id: true },
+        });
+
+        const follow = [];
+        let i = 0;
+        const len = following.length;
+        for (i; i < len; i++) {
+            follow.push(following[i].id);
+        }
+        follow.push(id);
+
+        return this.userRepository.find({
+            where: {
+                id: Not(In(follow.map((val) => val))),
+            },
+            take: 5,
+        });
     }
 
     async deleteUser(id, session, password) {
