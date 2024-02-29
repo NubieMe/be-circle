@@ -1,50 +1,37 @@
-import { Router } from "express";
-import authController from "../controllers/authController";
-import * as multer from "multer";
-import userController from "../controllers/userController";
-import threadController from "../controllers/threadController";
-import authMiddleware from "../middlewares/auth";
-import followController from "../controllers/followController";
-import likeController from "../controllers/likeController";
-import replyController from "../controllers/replyController";
-import upload from "../middlewares/uploadFile";
+import { Request, Response, Router } from "express";
+import authRoutes from "./auth";
+import userRoutes from "./user";
+import threadRoutes from "./thread";
+import likeRoutes from "./like";
+import replyRoutes from "./reply";
+import followRoutes from "./follow";
 
 const routes = Router();
 
-//Auth API
-routes.post("/register", authController.register);
-routes.post("/login", authController.login);
-routes.delete("/logout", authController.logout);
+routes.use("/", authRoutes);
+routes.use("/", userRoutes);
+routes.use("/", threadRoutes);
+routes.use("/", likeRoutes);
+routes.use("/", replyRoutes);
+routes.use("/", followRoutes);
 
-//User API
-routes.get("/search", userController.getUsers);
-routes.get("/user/:id", userController.getUser);
-routes.get("/user/me/current", authMiddleware.auth, userController.getCurrent);
-routes.patch("/user/:id", authMiddleware.auth, userController.updateUser);
-routes.patch("/upload/picture/:id", authMiddleware.auth, upload.single("image"), userController.uploadPicture);
-routes.patch("/upload/cover/:id", authMiddleware.auth, upload.single("image"), userController.uploadCover);
-routes.delete("/user/:id", authMiddleware.auth, userController.deleteUser);
+//notif sse
+routes.get("/notification", (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
 
-//Thread API
-routes.post("/thread", authMiddleware.auth, upload.array("image"), threadController.createThread);
-routes.get("/thread", threadController.getThreads);
-routes.get("/thread/:id", threadController.getThread);
-routes.patch("/thread/:id", authMiddleware.auth, upload.array("image"), threadController.updateThread);
-routes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread);
+    res.write("event: message\n");
+    function sendNotification(data: any) {
+        res.write("data: " + data + "\n\n");
+    }
 
-//Follow API
-routes.post("/follow", authMiddleware.auth, followController.follow);
-routes.get("/follow/:id", followController.getFollow);
-routes.delete("/unfollow", authMiddleware.auth, followController.unfollow);
+    routes.get("/new-thread", (req, res) => {
+        const thread = JSON.stringify({ message: "New Thread" });
+        sendNotification(thread);
 
-//Like API
-routes.post("/like/thread", authMiddleware.auth, likeController.likeThread);
-routes.post("/like/reply", authMiddleware.auth, likeController.likeReply);
-routes.delete("/unlike/thread", authMiddleware.auth, likeController.unlikeThread);
-routes.delete("/unlike/reply", authMiddleware.auth, likeController.unlikeReply);
-
-//Reply API
-routes.post("/reply/thread", authMiddleware.auth, upload.single("image"), replyController.replyThread);
-routes.delete("/reply/:id", authMiddleware.auth, replyController.deleteReply);
+        res.status(200);
+    });
+});
 
 export default routes;
