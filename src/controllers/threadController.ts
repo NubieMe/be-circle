@@ -14,7 +14,7 @@ export default new (class ThreadController {
 
     async getThread(req: Request, res: Response) {
         try {
-            const response = await threadService.getThread(req.params, req.query.id);
+            const response = await threadService.getThread(req.params.id, req.query.id);
 
             res.status(200).json(response);
         } catch (error) {
@@ -25,7 +25,6 @@ export default new (class ThreadController {
     async createThread(req: Request, res: Response) {
         try {
             let data;
-
             if (!req.files) {
                 data = {
                     content: req.body.content,
@@ -50,14 +49,14 @@ export default new (class ThreadController {
         try {
             let data;
 
-            if (!req.file) {
+            if (!req.files) {
                 data = {
                     content: req.body.content,
                 };
             } else {
                 data = {
                     content: req.body.content,
-                    image: req.file.filename,
+                    image: req.files,
                 };
             }
             const response = await threadService.updateThread(req.params, data, res.locals.session.id);

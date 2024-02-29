@@ -40,9 +40,9 @@ export default new (class ThreadService {
                 id: response[i].id,
                 content: response[i].content,
                 image: response[i].image,
-                likes: response[i].likes.length,
+                likes: response[i].likes,
                 isLiked: await likes[i],
-                replies: response[i].replies.length,
+                replies: response[i].replies,
                 author: response[i].author,
                 created_at: response[i].created_at,
                 updated_at: response[i].updated_at,
@@ -54,7 +54,7 @@ export default new (class ThreadService {
 
     async getThread(id, userId) {
         const response = await this.threadRepository.findOne({
-            where: id,
+            where: { id },
             relations: {
                 author: true,
                 likes: true,
@@ -77,7 +77,7 @@ export default new (class ThreadService {
             content: response.content,
             image: response.image,
             author: response.author,
-            likes: response.likes.length,
+            likes: response.likes,
             isLiked: like,
             replies,
             created_at: response.created_at,
@@ -90,8 +90,8 @@ export default new (class ThreadService {
         let valid;
 
         if (data.image && data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
-            // console.log(data.image);
 
             valid = {
                 content: isValid.content,
@@ -104,6 +104,7 @@ export default new (class ThreadService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
@@ -134,6 +135,7 @@ export default new (class ThreadService {
         let valid;
 
         if (data.image && data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
@@ -147,6 +149,7 @@ export default new (class ThreadService {
                 updated_at: isValid.updated_at,
             };
         } else if (data.image && !data.content) {
+            cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
