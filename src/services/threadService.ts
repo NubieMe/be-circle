@@ -7,49 +7,48 @@ import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
 import likeService from "./likeService";
 import replyService from "./replyService";
+import { redisClient } from "../libs/redis";
 
 export default new (class ThreadService {
     private readonly threadRepository: Repository<Thread> = AppDataSource.getRepository(Thread);
 
     async getThreads(id) {
-        const response = await this.threadRepository.find({
-            order: {
-                id: "DESC",
-            },
-            relations: {
-                author: true,
-                likes: true,
-                replies: true,
-            },
-            select: {
-                author: {
-                    id: true,
-                    name: true,
-                    username: true,
-                    picture: true,
+        let data
+        data = await redisClient.get("threads");
+        if (!data) {
+            const response = await this.threadRepository.find({
+                order: {
+                    id: "DESC",
                 },
-            },
-        });
-        const likes = response.map(async (val) => await likeService.getLikeThread(val.id, id));
-
-        const threads = [];
-        let i = 0;
-        const len = response.length;
-        for (i; i < len; i++) {
-            threads.push({
-                id: response[i].id,
-                content: response[i].content,
-                image: response[i].image,
-                likes: response[i].likes,
-                isLiked: await likes[i],
-                replies: response[i].replies,
-                author: response[i].author,
-                created_at: response[i].created_at,
-                updated_at: response[i].updated_at,
+                relations: {
+                    author: true,
+                    likes: true,
+                    replies: true,
+                },
+                select: {
+                    author: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        picture: true,
+                    },
+                },
             });
+            const threads = await Promise.all(
+                response.map(async (val) => {
+                    const likes = await likeService.getLikeThread(val.id, id);
+                    return {
+                        ...val,
+                        isLiked: likes,
+                    };
+                })
+            )
+            const stringThreads = JSON.stringify(threads);
+            await redisClient.set("threads", stringThreads);
+            data = stringThreads
         }
 
-        return await Promise.all(threads);
+        return JSON.parse(data);
     }
 
     async getThread(id, userId) {
@@ -175,6 +174,7 @@ export default new (class ThreadService {
         if (session !== chkThread.author.id) throw new ResponseError(403, "Cannot delete another user's Thread");
         cloudinary.deletes(chkThread.image);
         await this.threadRepository.delete(id);
+        await redisClient.del("threads");
         return {
             message: "Thread deleted",
         };
