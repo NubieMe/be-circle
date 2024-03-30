@@ -22,16 +22,16 @@ routes.get("/notification", (req: Request, res: Response) => {
     res.setHeader("Connection", "keep-alive");
 
     res.write("event: message\n");
-    function sendNotification(data: any) {
-        res.write("data: " + data + "\n\n");
-    }
-
-    routes.get("/new-thread", (req, res) => {
-        const thread = JSON.stringify({ message: "New Thread" });
-        sendNotification(thread);
-
-        res.status(200);
-    });
 });
+// function sendNotification(data: any) {
+//     res.write("data: " + data + "\n\n");
+// }
+
+// routes.get("/new-thread", (req, res) => {
+//     const thread = JSON.stringify({ message: "New Thread" });
+//     sendNotification(thread);
+
+//     res.status(200);
+// });
 
 export default routes;

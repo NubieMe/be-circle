@@ -69,7 +69,7 @@ export default new (class UserController {
 
     async suggestion(req: Request, res: Response) {
         try {
-            const response = await userService.suggestion(Number(req.query.id));
+            const response = await userService.suggestion(res.locals.session.id);
             res.status(200).json(response);
         } catch (error) {
             res.status(error.status).json({ message: error.message });

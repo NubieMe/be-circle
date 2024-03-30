@@ -4,7 +4,7 @@ import followService from "../services/followService";
 export default new (class FollowController {
     async getFollows(req: Request, res: Response) {
         try {
-            const response = await followService.getFollows(req.params.id);
+            const response = await followService.getFollows(res.locals.session.id);
 
             res.status(200).json(response);
         } catch (error) {

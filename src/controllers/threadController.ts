@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import threadService from "../services/threadService";
+import ThreadQueue from "../queue/ThreadQueue";
 
 export default new (class ThreadController {
     async getThreads(req: Request, res: Response) {
@@ -37,9 +38,10 @@ export default new (class ThreadController {
                     author: res.locals.session.id,
                 };
             }
-            const response = await threadService.createThread(data);
+            // const response = await threadService.createThread(data);
+            const response = await ThreadQueue.create(data);
 
-            res.status(201).json(response);
+            return res.status(201).json(response);
         } catch (error) {
             res.status(error.status).json(error.message);
         }

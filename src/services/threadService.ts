@@ -14,7 +14,7 @@ export default new (class ThreadService {
 
     async getThreads(id) {
         let data
-        data = await redisClient.get("threads");
+        // data = await redisClient.get("threads");
         if (!data) {
             const response = await this.threadRepository.find({
                 order: {
@@ -32,8 +32,12 @@ export default new (class ThreadService {
                         username: true,
                         picture: true,
                     },
+                    likes: {
+                        id: true,
+                    }
                 },
             });
+            // console.log(response[13].likes)
             const threads = await Promise.all(
                 response.map(async (val) => {
                     const likes = await likeService.getLikeThread(val.id, id);

@@ -1,7 +1,7 @@
 import joi = require("joi");
 
 export const createThreadSchema = joi.object({
-    content: joi.string().max(160).optional(),
+    content: joi.string().max(160).optional().allow(""),
     image: joi.array().optional(),
     author: joi.number().required(),
 });

@@ -12,18 +12,8 @@ export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
     async getUsers(name, id) {
-        const response = await this.userRepository.query(
+        return await this.userRepository.query(
             `SELECT * FROM users WHERE name ILIKE '%${name}%' OR username ILIKE '%${name}%';`
-        );
-        return await Promise.all(
-            response.map(async (val) => {
-                const follow = await followService.getFollow(val.id, id);
-
-                return {
-                    ...val,
-                    isFollow: follow,
-                };
-            })
         );
     }
 
@@ -45,6 +35,7 @@ export default new (class UserService {
                 replies: true,
             },
         });
+        // console.log(response)
         const threads = response.threads
             .slice(0)
             .reverse()

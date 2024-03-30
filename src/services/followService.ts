@@ -20,26 +20,10 @@ export default new (class FollowService {
                 follower: true,
             },
         });
-        const wer = await Promise.all(
-            follower.map(async (val) => {
-                const isFollow = await this.getFollow(val.id, id);
-
-                return {
-                    ...val,
-                    isFollow,
-                };
-            })
-        );
-        const wing = following.map((val) => {
-            return {
-                ...val,
-                isFollow: true,
-            };
-        });
 
         return {
-            follower: wer,
-            following: wing,
+            follower,
+            following
         };
     }
 
@@ -54,21 +38,21 @@ export default new (class FollowService {
         return false;
     }
 
-    async follow(follower, following) {
+    async follow(to, from) {
         const chkFollow = await this.followRepository.countBy({
-            following: Equal(following),
-            follower: Equal(follower),
+            following: Equal(from),
+            follower: Equal(to),
         });
         if (chkFollow) throw new ResponseError(400, "You already follow this User");
-        await this.followRepository.save({ following, follower });
+        await this.followRepository.save({ following: from, follower: to });
         return {
             message: "Follow success",
         };
     }
 
-    async unfollow(follower, following) {
+    async unfollow(to, from) {
         const getFollow = await this.followRepository.findOne({
-            where: { following: Equal(following), follower: Equal(follower) },
+            where: { following: Equal(from), follower: Equal(to) },
             relations: {
                 following: true,
                 follower: true,

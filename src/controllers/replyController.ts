@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import replyService from "../services/replyService";
+import ReplyWorker from "../workers/ReplyWorker";
+import ReplyQueue from "../queue/ReplyQueue";
 
 export default new (class ReplyController {
     async replyThread(req: Request, res: Response) {
@@ -19,7 +21,8 @@ export default new (class ReplyController {
                     author: res.locals.session.id,
                 };
             }
-            const response = await replyService.replyThread(data);
+            // const response = await replyService.replyThread(data);
+            const response = await ReplyQueue.create(data);
 
             res.status(201).json(response);
         } catch (error) {
