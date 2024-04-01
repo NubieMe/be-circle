@@ -7,7 +7,7 @@ const threadRoutes = Router();
 
 threadRoutes.post("/thread", authMiddleware.auth, upload.any(), threadController.createThread);
 threadRoutes.get("/thread", threadController.getThreads);
-threadRoutes.get("/thread/:id", threadController.getThread);
+threadRoutes.get("/thread/:id", authMiddleware.auth, threadController.getThread);
 threadRoutes.patch("/thread/:id", authMiddleware.auth, upload.any(), threadController.updateThread);
 threadRoutes.delete("/thread/:id", authMiddleware.auth, threadController.deleteThread);
 
