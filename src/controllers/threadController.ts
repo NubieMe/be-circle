@@ -5,7 +5,7 @@ import ThreadQueue from "../queue/ThreadQueue";
 export default new (class ThreadController {
     async getThreads(req: Request, res: Response) {
         try {
-            const response = await threadService.getThreads(req.query.id);
+            const response = await threadService.getThreads();
 
             res.status(200).json(response);
         } catch (error) {
@@ -15,7 +15,7 @@ export default new (class ThreadController {
 
     async getThread(req: Request, res: Response) {
         try {
-            const response = await threadService.getThread(req.params.id, req.query.id);
+            const response = await threadService.getThread(req.params.id, res.locals.session.id);
 
             res.status(200).json(response);
         } catch (error) {
@@ -38,8 +38,8 @@ export default new (class ThreadController {
                     author: res.locals.session.id,
                 };
             }
-            // const response = await threadService.createThread(data);
-            const response = await ThreadQueue.create(data);
+            const response = await threadService.createThread(data);
+            // const response = await ThreadQueue.create(data);
 
             return res.status(201).json(response);
         } catch (error) {
