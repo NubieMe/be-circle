@@ -12,19 +12,15 @@ import { redisClient } from "../libs/redis";
 export default new (class ThreadService {
     private readonly threadRepository: Repository<Thread> = AppDataSource.getRepository(Thread);
 
-    async getThreads(id) {
-        let data
-        // data = await redisClient.get("threads");
+    async getThreads() {
+        let data;
+        data = await redisClient.get("threads");
         if (!data) {
             const response = await this.threadRepository.find({
                 order: {
                     id: "DESC",
                 },
-                relations: {
-                    author: true,
-                    likes: true,
-                    replies: true,
-                },
+                relations: ["likes", "likes.author", "author", "replies"],
                 select: {
                     author: {
                         id: true,
@@ -34,22 +30,18 @@ export default new (class ThreadService {
                     },
                     likes: {
                         id: true,
-                    }
+                        author: {
+                            id: true,
+                        },
+                    },
+                    replies: {
+                        id: true,
+                    },
                 },
             });
-            // console.log(response[13].likes)
-            const threads = await Promise.all(
-                response.map(async (val) => {
-                    const likes = await likeService.getLikeThread(val.id, id);
-                    return {
-                        ...val,
-                        isLiked: likes,
-                    };
-                })
-            )
-            const stringThreads = JSON.stringify(threads);
+            const stringThreads = JSON.stringify(response);
             await redisClient.set("threads", stringThreads);
-            data = stringThreads
+            data = stringThreads;
         }
 
         return JSON.parse(data);
@@ -73,15 +65,14 @@ export default new (class ThreadService {
             },
         });
 
-        const like = await likeService.getLikeThread(response.id, userId);
+        const like = await likeService.getLikeThread(response.id);
         const replies = await replyService.getRepliesThread(response.id, userId);
         return {
             id: response.id,
             content: response.content,
             image: response.image,
             author: response.author,
-            likes: response.likes,
-            isLiked: like,
+            likes: like,
             replies,
             created_at: response.created_at,
             updated_at: response.updated_at,
@@ -119,6 +110,7 @@ export default new (class ThreadService {
         }
 
         await this.threadRepository.save(valid);
+        await redisClient.del("threads");
         return {
             message: "Thread created",
             data: valid,
@@ -176,8 +168,10 @@ export default new (class ThreadService {
         if (!chkThread) throw new ResponseError(404, "Not Found");
 
         if (session !== chkThread.author.id) throw new ResponseError(403, "Cannot delete another user's Thread");
-        cloudinary.deletes(chkThread.image);
         await this.threadRepository.delete(id);
+        if (chkThread.image) {
+            cloudinary.deletes(chkThread.image);
+        }
         await redisClient.del("threads");
         return {
             message: "Thread deleted",
