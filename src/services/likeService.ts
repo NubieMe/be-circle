@@ -2,6 +2,7 @@ import { Equal, Repository } from "typeorm";
 import { Like } from "../entities/Like";
 import { AppDataSource } from "../data-source";
 import ResponseError from "../error/responseError";
+import { redisClient } from "../libs/redis";
 
 export default new (class LikeService {
     private readonly likeRepository: Repository<Like> = AppDataSource.getRepository(Like);
@@ -18,6 +19,7 @@ export default new (class LikeService {
             thread: threadId,
             author: sessionId,
         });
+        redisClient.del("threads");
         return {
             message: "Thread Liked",
         };
@@ -40,15 +42,14 @@ export default new (class LikeService {
         };
     }
 
-    async getLikeThread(threadId, authorId) {
+    async getLikeThread(id) {
         const chk = await this.likeRepository
             .createQueryBuilder("like")
-            .where("like.thread = :thread", { thread: threadId })
-            .andWhere("like.author = :author", { author: authorId })
-            .getOne();
-
-        if (chk) return true;
-        return false;
+            .where("like.thread = :thread", { thread: id })
+            .leftJoinAndSelect("like.author", "author")
+            .select(["like.id", "author.id"])
+            .getMany();
+        return chk;
     }
 
     async getLikeReply(replyId, authorId) {
@@ -73,6 +74,7 @@ export default new (class LikeService {
         if (!getLike) throw new ResponseError(404, "You already unlike this Thread");
 
         await this.likeRepository.delete(getLike.id);
+        redisClient.del("threads");
         return {
             message: "Unliked",
         };
