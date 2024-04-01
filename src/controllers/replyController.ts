@@ -7,7 +7,7 @@ export default new (class ReplyController {
     async replyThread(req: Request, res: Response) {
         try {
             let data;
-            if (!req.files[0]) {
+            if (!req.file) {
                 data = {
                     content: req.body.content,
                     thread: req.body.thread,
@@ -16,13 +16,13 @@ export default new (class ReplyController {
             } else {
                 data = {
                     content: req.body.content,
-                    image: req.files[0].filename,
+                    image: req.file.filename,
                     thread: req.body.thread,
                     author: res.locals.session.id,
                 };
             }
-            // const response = await replyService.replyThread(data);
-            const response = await ReplyQueue.create(data);
+            const response = await replyService.replyThread(data);
+            // const response = await ReplyQueue.create(data);
 
             res.status(201).json(response);
         } catch (error) {

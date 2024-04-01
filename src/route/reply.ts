@@ -5,7 +5,7 @@ import replyController from "../controllers/replyController";
 
 const replyRoutes = Router();
 
-replyRoutes.post("/reply/thread", authMiddleware.auth, upload.any(), replyController.replyThread);
+replyRoutes.post("/reply/thread", authMiddleware.auth, upload.single("image"), replyController.replyThread);
 replyRoutes.delete("/reply/:id", authMiddleware.auth, replyController.deleteReply);
 
 export default replyRoutes;
