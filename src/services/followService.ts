@@ -23,19 +23,8 @@ export default new (class FollowService {
 
         return {
             follower,
-            following
+            following,
         };
-    }
-
-    async getFollow(follower, following) {
-        const check = await this.followRepository.count({
-            where: {
-                following: Equal(following),
-                follower: Equal(follower),
-            },
-        });
-        if (check !== 0) return true;
-        return false;
     }
 
     async follow(to, from) {
