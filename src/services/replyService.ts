@@ -6,6 +6,7 @@ import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
 import { replyThreadSchema } from "../utils/validator/reply";
 import likeService from "./likeService";
+import { redisClient } from "../libs/redis";
 
 export default new (class ReplyService {
     private readonly replyRepository: Repository<Reply> = AppDataSource.getRepository(Reply);
@@ -73,6 +74,7 @@ export default new (class ReplyService {
         }
 
         await this.replyRepository.save(valid);
+        redisClient.del("threads");
         return {
             message: "Reply created",
             data: valid,
@@ -87,6 +89,7 @@ export default new (class ReplyService {
 
         cloudinary.delete(chkReply.image);
         await this.replyRepository.delete(id);
+        redisClient.del("threads");
         return {
             message: "Reply deleted",
         };

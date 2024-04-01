@@ -7,11 +7,12 @@ import threadService from "./threadService";
 import { Follow } from "../entities/Follow";
 import cloudinary from "../libs/cloudinary";
 import followService from "./followService";
+import { redisClient } from "../libs/redis";
 
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
 
-    async getUsers(name, id) {
+    async getUsers(name) {
         return await this.userRepository.query(
             `SELECT * FROM users WHERE name ILIKE '%${name}%' OR username ILIKE '%${name}%';`
         );
@@ -35,7 +36,6 @@ export default new (class UserService {
                 replies: true,
             },
         });
-        // console.log(response)
         const threads = response.threads
             .slice(0)
             .reverse()
@@ -111,6 +111,7 @@ export default new (class UserService {
         }
 
         await this.userRepository.update({ id }, user);
+        await redisClient.del("threads");
         return {
             message: "Account updated",
             user: data.username,
@@ -125,6 +126,7 @@ export default new (class UserService {
         const upload = (await cloudinary.upload(picture)).secure_url;
 
         await this.userRepository.update({ id }, { picture: upload });
+        await redisClient.del("threads");
         return {
             message: "Picture uploaded",
         };
@@ -173,6 +175,7 @@ export default new (class UserService {
         if (!isEqual) throw new ResponseError(400, "Wrong password");
 
         await this.userRepository.delete({ id });
+        await redisClient.del("threads");
         return {
             message: "Account deleted",
         };
