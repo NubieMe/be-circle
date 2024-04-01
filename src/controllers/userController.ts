@@ -4,7 +4,7 @@ import userService from "../services/userService";
 export default new (class UserController {
     async getUsers(req: Request, res: Response) {
         try {
-            const response = await userService.getUsers(req.query.name, res.locals.session.id);
+            const response = await userService.getUsers(req.query.name);
 
             res.status(200).json(response);
         } catch (error) {
@@ -46,7 +46,7 @@ export default new (class UserController {
             const response = await userService.uploadPicture(
                 parseInt(req.params.id),
                 res.locals.session.id,
-                req.files[0].filename
+                req.file.filename
             );
             res.status(200).json(response);
         } catch (error) {
@@ -59,7 +59,7 @@ export default new (class UserController {
             const response = await userService.uploadCover(
                 parseInt(req.params.id),
                 res.locals.session.id,
-                req.files[0].filename
+                req.file.filename
             );
             res.status(200).json(response);
         } catch (error) {
