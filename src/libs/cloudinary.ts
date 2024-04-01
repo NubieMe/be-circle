@@ -52,7 +52,12 @@ export default new (class CloudinaryConfig {
 
     async deletes(image: string[]) {
         const files = [];
-        image.forEach((name) => files.push(extractPublicId(name)));
+        let i = 0;
+        const len = image.length;
+        for (i; i < len; i++) {
+            const publicId = extractPublicId(image[i]);
+            files.push(publicId);
+        }
         cloudinary.api.delete_resources(files);
     }
 })();
