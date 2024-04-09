@@ -47,14 +47,10 @@ export default new (class ThreadService {
         return JSON.parse(data);
     }
 
-    async getThread(id, userId) {
+    async getThread(id) {
         const response = await this.threadRepository.findOne({
             where: { id },
-            relations: {
-                author: true,
-                likes: true,
-                replies: true,
-            },
+            relations: ["likes", "likes.author", "author"],
             select: {
                 author: {
                     id: true,
@@ -62,17 +58,23 @@ export default new (class ThreadService {
                     username: true,
                     picture: true,
                 },
+                likes: {
+                    id: true,
+                    author: {
+                        id: true,
+                    },
+                },
             },
         });
 
-        const like = await likeService.getLikeThread(response.id);
-        const replies = await replyService.getRepliesThread(response.id, userId);
+        // const like = await likeService.getLikeThread(response.id);
+        const replies = await replyService.getRepliesThread(response.id);
         return {
             id: response.id,
             content: response.content,
             image: response.image,
             author: response.author,
-            likes: like,
+            likes: response.likes,
             replies,
             created_at: response.created_at,
             updated_at: response.updated_at,

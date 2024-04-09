@@ -15,7 +15,7 @@ export default new (class ThreadController {
 
     async getThread(req: Request, res: Response) {
         try {
-            const response = await threadService.getThread(req.params.id, res.locals.session.id);
+            const response = await threadService.getThread(req.params.id);
 
             res.status(200).json(response);
         } catch (error) {
