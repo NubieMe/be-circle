@@ -6,7 +6,6 @@ import * as bcrypt from "bcrypt";
 import threadService from "./threadService";
 import { Follow } from "../entities/Follow";
 import cloudinary from "../libs/cloudinary";
-import followService from "./followService";
 import { redisClient } from "../libs/redis";
 
 export default new (class UserService {
@@ -39,7 +38,7 @@ export default new (class UserService {
         const threads = response.threads
             .slice(0)
             .reverse()
-            .map(async (val) => await threadService.getThread(val.id, response.id));
+            .map(async (val) => await threadService.getThread(val.id));
 
         return {
             id: response.id,

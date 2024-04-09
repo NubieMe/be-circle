@@ -13,7 +13,7 @@ AppDataSource.initialize()
         app.use(
             cors({
                 credentials: true,
-                origin: "http://localhost:5173",
+                origin: "*",
                 methods: ["GET", "POST", "PATCH", "DELETE"],
                 allowedHeaders: ["Origin", "Content-Type", "Authorization", "Accept"],
                 preflightContinue: true,
@@ -25,6 +25,7 @@ AppDataSource.initialize()
 
         app.listen(process.env.PORT, async () => {
             await redisClient.connect();
-            console.log(`Server is running!`)});
-        })
+            console.log(`Server is running!`);
+        });
+    })
     .catch((error) => console.log(error));
