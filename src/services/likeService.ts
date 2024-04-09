@@ -42,26 +42,23 @@ export default new (class LikeService {
         };
     }
 
-    async getLikeThread(id) {
-        const chk = await this.likeRepository
-            .createQueryBuilder("like")
-            .where("like.thread = :thread", { thread: id })
-            .leftJoinAndSelect("like.author", "author")
-            .select(["like.id", "author.id"])
-            .getMany();
-        return chk;
-    }
+    // async getLikeThread(id) {
+    //     return await this.likeRepository
+    //         .createQueryBuilder("like")
+    //         .where("like.thread = :thread", { thread: id })
+    //         .leftJoinAndSelect("like.author", "author")
+    //         .select(["like.id", "author.id"])
+    //         .getMany();
+    // }
 
-    async getLikeReply(replyId, authorId) {
-        const chk = await this.likeRepository
-            .createQueryBuilder("like")
-            .where("like.reply = :reply", { reply: replyId })
-            .andWhere("like.author = :author", { author: authorId })
-            .getOne();
-
-        if (chk) return true;
-        return false;
-    }
+    // async getLikeReply(id) {
+    //     return await this.likeRepository
+    //         .createQueryBuilder("like")
+    //         .where("like.reply = :reply", { reply: id })
+    //         .leftJoinAndSelect("like.author", "author")
+    //         .select(["like.id", "author.id"])
+    //         .getMany();
+    // }
 
     async unlikeThread(id, session) {
         const getLike = await this.likeRepository
