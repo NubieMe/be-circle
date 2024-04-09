@@ -1,43 +1,34 @@
-import { Repository } from "typeorm";
+import { Equal, Repository } from "typeorm";
 import { Reply } from "../entities/Reply";
 import { AppDataSource } from "../data-source";
 import { validate } from "../utils/validator/validation";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
 import { replyThreadSchema } from "../utils/validator/reply";
-import likeService from "./likeService";
 import { redisClient } from "../libs/redis";
 
 export default new (class ReplyService {
     private readonly replyRepository: Repository<Reply> = AppDataSource.getRepository(Reply);
 
-    async getRepliesThread(threadId, userId) {
-        const response = await this.replyRepository
-            .createQueryBuilder("reply")
-            .leftJoinAndSelect("reply.author", "author")
-            .leftJoinAndSelect("reply.likes", "likes")
-            .leftJoinAndSelect("reply.replies", "replies")
-            .where("reply.thread = :thread", { thread: threadId })
-            .getMany();
-        const likes = response.map(async (val) => await likeService.getLikeReply(val.id, userId));
-
-        const replies = [];
-        let i = 0;
-        const len = response.length;
-        for (i; i < len; i++) {
-            replies.push({
-                id: response[i].id,
-                content: response[i].content,
-                image: response[i].image,
-                likes: response[i].likes.length,
-                isLiked: await likes[i],
-                replies: response[i].replies.length,
-                author: response[i].author,
-                created_at: response[i].created_at,
-            });
-        }
-
-        return await Promise.all(replies);
+    async getRepliesThread(threadId) {
+        return await this.replyRepository.find({
+            where: { thread: Equal(threadId) },
+            relations: ["author", "likes", "likes.author"],
+            select: {
+                author: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    picture: true,
+                },
+                likes: {
+                    id: true,
+                    author: {
+                        id: true,
+                    },
+                },
+            },
+        });
     }
 
     async replyThread(data) {
