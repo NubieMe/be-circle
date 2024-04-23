@@ -5,7 +5,7 @@ import { validate } from "../utils/validator/validation";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
 import { replyThreadSchema } from "../utils/validator/reply";
-import { redisClient } from "../libs/redis";
+// import { redisClient } from "../libs/redis";
 
 export default new (class ReplyService {
     private readonly replyRepository: Repository<Reply> = AppDataSource.getRepository(Reply);
@@ -36,7 +36,7 @@ export default new (class ReplyService {
         let valid;
 
         if (data.image && data.content) {
-            cloudinary.config();
+            // cloudinary.config();
             const upFile = await cloudinary.upload(isValid.image);
 
             valid = {
@@ -52,7 +52,7 @@ export default new (class ReplyService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
-            cloudinary.config();
+            // cloudinary.config();
             const upFile = await cloudinary.upload(isValid.image);
 
             valid = {
@@ -65,7 +65,7 @@ export default new (class ReplyService {
         }
 
         await this.replyRepository.save(valid);
-        redisClient.del("threads");
+        // redisClient.del("threads");
         return {
             message: "Reply created",
             data: valid,
@@ -80,7 +80,7 @@ export default new (class ReplyService {
 
         cloudinary.delete(chkReply.image);
         await this.replyRepository.delete(id);
-        redisClient.del("threads");
+        // redisClient.del("threads");
         return {
             message: "Reply deleted",
         };

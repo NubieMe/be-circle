@@ -2,7 +2,7 @@ import { Equal, Repository } from "typeorm";
 import { Like } from "../entities/Like";
 import { AppDataSource } from "../data-source";
 import ResponseError from "../error/responseError";
-import { redisClient } from "../libs/redis";
+// import { redisClient } from "../libs/redis";
 
 export default new (class LikeService {
     private readonly likeRepository: Repository<Like> = AppDataSource.getRepository(Like);
@@ -19,7 +19,7 @@ export default new (class LikeService {
             thread: threadId,
             author: sessionId,
         });
-        redisClient.del("threads");
+        // redisClient.del("threads");
         return {
             message: "Thread Liked",
         };
@@ -71,7 +71,7 @@ export default new (class LikeService {
         if (!getLike) throw new ResponseError(404, "You already unlike this Thread");
 
         await this.likeRepository.delete(getLike.id);
-        redisClient.del("threads");
+        // redisClient.del("threads");
         return {
             message: "Unliked",
         };

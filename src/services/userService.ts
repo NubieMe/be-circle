@@ -6,7 +6,7 @@ import * as bcrypt from "bcrypt";
 import threadService from "./threadService";
 import { Follow } from "../entities/Follow";
 import cloudinary from "../libs/cloudinary";
-import { redisClient } from "../libs/redis";
+// import { redisClient } from "../libs/redis";
 
 export default new (class UserService {
     private readonly userRepository: Repository<User> = AppDataSource.getRepository(User);
@@ -110,7 +110,7 @@ export default new (class UserService {
         }
 
         await this.userRepository.update({ id }, user);
-        await redisClient.del("threads");
+        // await redisClient.del("threads");
         return {
             message: "Account updated",
             user: data.username,
@@ -121,11 +121,11 @@ export default new (class UserService {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
         if (!picture) throw new ResponseError(400, "Picture is required");
 
-        cloudinary.config();
+        // cloudinary.config();
         const upload = (await cloudinary.upload(picture)).secure_url;
 
         await this.userRepository.update({ id }, { picture: upload });
-        await redisClient.del("threads");
+        // await redisClient.del("threads");
         return {
             message: "Picture uploaded",
         };
@@ -135,7 +135,7 @@ export default new (class UserService {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
         if (!cover) throw new ResponseError(400, "Cover image is required");
 
-        cloudinary.config();
+        // cloudinary.config();
         const upload = (await cloudinary.upload(cover)).secure_url;
 
         await this.userRepository.update({ id }, { cover: upload });
@@ -174,7 +174,7 @@ export default new (class UserService {
         if (!isEqual) throw new ResponseError(400, "Wrong password");
 
         await this.userRepository.delete({ id });
-        await redisClient.del("threads");
+        // await redisClient.del("threads");
         return {
             message: "Account deleted",
         };

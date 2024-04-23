@@ -5,46 +5,47 @@ import { validate } from "../utils/validator/validation";
 import { createThreadSchema, updateThreadSchema } from "../utils/validator/thread";
 import cloudinary from "../libs/cloudinary";
 import ResponseError from "../error/responseError";
-import likeService from "./likeService";
+// import likeService from "./likeService";
 import replyService from "./replyService";
-import { redisClient } from "../libs/redis";
+// import { redisClient } from "../libs/redis";
 
 export default new (class ThreadService {
     private readonly threadRepository: Repository<Thread> = AppDataSource.getRepository(Thread);
 
     async getThreads() {
-        let data;
-        data = await redisClient.get("threads");
-        if (!data) {
-            const response = await this.threadRepository.find({
-                order: {
-                    id: "DESC",
+        // let data;
+        // data = await redisClient.get("threads");
+        // if (!data) {
+        const response = await this.threadRepository.find({
+            order: {
+                id: "DESC",
+            },
+            relations: ["likes", "likes.author", "author", "replies"],
+            select: {
+                author: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    picture: true,
                 },
-                relations: ["likes", "likes.author", "author", "replies"],
-                select: {
+                likes: {
+                    id: true,
                     author: {
                         id: true,
-                        name: true,
-                        username: true,
-                        picture: true,
-                    },
-                    likes: {
-                        id: true,
-                        author: {
-                            id: true,
-                        },
-                    },
-                    replies: {
-                        id: true,
                     },
                 },
-            });
-            const stringThreads = JSON.stringify(response);
-            await redisClient.set("threads", stringThreads);
-            data = stringThreads;
-        }
+                replies: {
+                    id: true,
+                },
+            },
+        });
+        return response;
+        //     const stringThreads = JSON.stringify(response);
+        //     await redisClient.set("threads", stringThreads);
+        //     data = stringThreads;
+        // }
 
-        return JSON.parse(data);
+        // return JSON.parse(data);
     }
 
     async getThread(id) {
@@ -100,7 +101,7 @@ export default new (class ThreadService {
                 author: isValid.author,
             };
         } else if (data.image && !data.content) {
-            cloudinary.config();
+            // cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
@@ -112,7 +113,7 @@ export default new (class ThreadService {
         }
 
         await this.threadRepository.save(valid);
-        await redisClient.del("threads");
+        // await redisClient.del("threads");
         return {
             message: "Thread created",
             data: valid,
@@ -132,7 +133,7 @@ export default new (class ThreadService {
         let valid;
 
         if (data.image && data.content) {
-            cloudinary.config();
+            // cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
@@ -146,7 +147,7 @@ export default new (class ThreadService {
                 updated_at: isValid.updated_at,
             };
         } else if (data.image && !data.content) {
-            cloudinary.config();
+            // cloudinary.config();
             const upFile = await cloudinary.uploads(isValid.image);
 
             valid = {
@@ -174,7 +175,7 @@ export default new (class ThreadService {
         if (chkThread.image) {
             cloudinary.deletes(chkThread.image);
         }
-        await redisClient.del("threads");
+        // await redisClient.del("threads");
         return {
             message: "Thread deleted",
         };

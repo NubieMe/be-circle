@@ -4,7 +4,7 @@ import * as cors from "cors";
 import routes from "./route";
 import "dotenv/config";
 import cloudinary from "./libs/cloudinary";
-import { redisClient } from "./libs/redis";
+// import { redisClient } from "./libs/redis";
 
 AppDataSource.initialize()
     .then(async () => {
@@ -24,7 +24,7 @@ AppDataSource.initialize()
         app.use("/api/v1", routes);
 
         app.listen(process.env.PORT, async () => {
-            await redisClient.connect();
+            // await redisClient.connect();
             console.log(`Server is running!`);
         });
     })
