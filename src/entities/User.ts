@@ -21,7 +21,7 @@ export class User {
     @Column({ length: 255, select: false })
     password: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, default: "https://res.cloudinary.com/dydmnzkfh/image/upload/v1713671817/ekv4nylpxrwvmacu2cbj.jpg" })
     picture: string;
 
     @Column({ nullable: true })
