@@ -14,6 +14,7 @@ export default new (class FollowService {
                 following: true,
             },
         });
+
         const following = await AppDataSource.getRepository(User).find({
             where: { follower: { following: Equal(id) } },
             relations: {
@@ -32,8 +33,10 @@ export default new (class FollowService {
             following: Equal(from),
             follower: Equal(to),
         });
+
         if (chkFollow) throw new ResponseError(400, "You already follow this User");
         await this.followRepository.save({ following: from, follower: to });
+
         return {
             message: "Follow success",
         };
@@ -47,8 +50,10 @@ export default new (class FollowService {
                 follower: true,
             },
         });
+
         if (!getFollow) throw new ResponseError(400, "You already unfollow this User");
         await this.followRepository.delete(getFollow.id);
+
         return {
             message: "Unfollow success",
         };

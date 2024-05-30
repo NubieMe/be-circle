@@ -88,6 +88,7 @@ export default new (class LikeService {
         if (!getLike) throw new ResponseError(404, "You already unlike this Reply");
 
         await this.likeRepository.delete(getLike.id);
+
         return {
             message: "Unliked",
         };

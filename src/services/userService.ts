@@ -35,6 +35,7 @@ export default new (class UserService {
                 replies: true,
             },
         });
+
         const threads = response.threads
             .slice(0)
             .reverse()
@@ -121,7 +122,6 @@ export default new (class UserService {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
         if (!picture) throw new ResponseError(400, "Picture is required");
 
-        // cloudinary.config();
         const upload = (await cloudinary.upload(picture)).secure_url;
 
         await this.userRepository.update({ id }, { picture: upload });
@@ -135,7 +135,6 @@ export default new (class UserService {
         if (session !== id) throw new ResponseError(403, "Cannot update another user's profile");
         if (!cover) throw new ResponseError(400, "Cover image is required");
 
-        // cloudinary.config();
         const upload = (await cloudinary.upload(cover)).secure_url;
 
         await this.userRepository.update({ id }, { cover: upload });
@@ -153,6 +152,7 @@ export default new (class UserService {
         const follow = [];
         let i = 0;
         const len = following.length;
+
         for (i; i < len; i++) {
             follow.push(following[i].id);
         }

@@ -33,6 +33,7 @@ export default new (class ReplyController {
     async deleteReply(req: Request, res: Response) {
         try {
             const response = await replyService.deleteReply(req.params.id, res.locals.session.id);
+
             res.status(200).json(response);
         } catch (error) {
             res.status(error.status).json({ message: error.message });

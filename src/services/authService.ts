@@ -22,17 +22,17 @@ export default new (class AuthService {
 
         const hash = await bcrypt.hash(isValid.password, 10);
 
-        await this.authRepository.save({
+        const user = await this.authRepository.save({
             name: isValid.name,
             username: isValid.username,
             email: isValid.email,
             password: hash,
         });
-        const get = await this.authRepository.findOne({ where: { username: isValid.username } });
 
-        const token = jwt.sign({ id: get.id, username: get.username }, process.env.SECRET_KEY, {
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.SECRET_KEY, {
             expiresIn: "7d",
         });
+
         return {
             message: "Account created",
             token: token,
@@ -50,6 +50,7 @@ export default new (class AuthService {
                 password: true,
             },
         });
+
         const chkEmail = await this.authRepository.findOne({
             where: { email: isValid.username },
             select: {
@@ -58,6 +59,7 @@ export default new (class AuthService {
                 password: true,
             },
         });
+
         if (!chkUser && !chkEmail) throw new ResponseError(401, "Username/Email not registered yet!");
 
         let isEqual;
@@ -80,7 +82,7 @@ export default new (class AuthService {
 
         return {
             message: "Login success",
-            token: token,
+            token,
         };
     }
 })();
