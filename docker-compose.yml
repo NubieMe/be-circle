@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  app:
+  circle:
     image: nubieme/circle:latest
     restart: always
     env_file:
