@@ -13,7 +13,7 @@ AppDataSource.initialize()
         app.use(
             cors({
                 credentials: true,
-                origin: "*",
+                origin: "https://circle-b51.vercel.app",
                 methods: ["GET", "POST", "PATCH", "DELETE"],
                 allowedHeaders: ["Origin", "Content-Type", "Authorization", "Accept"],
                 preflightContinue: true,
