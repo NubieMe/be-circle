@@ -42,6 +42,7 @@
         "worker": "nodemon --exec ts-node src/workers/index.ts",
         "migrate:generate": "npx typeorm-ts-node-commonjs migration:generate ./src/migrations/My-Migration -d ./src/data-source.ts",
         "migrate:run": "npx typeorm-ts-node-commonjs migration:run -d ./src/data-source.ts",
+        "migrate:prod": "npx typeorm migration:run -d ./dist/data-source.js",
         "schema:drop": "npx typeorm-ts-node-commonjs schema:drop -d ./src/data-source.ts"
     }
 }
