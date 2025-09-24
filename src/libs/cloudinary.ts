@@ -19,8 +19,8 @@ export default new (class CloudinaryConfig {
 
     async upload(image: string) {
         try {
-            const res = await cloudinary.uploader.upload(`src/uploads/${image}`, { folder: "circle-pp" });
-            fs.unlinkSync(`src/uploads/${image}`);
+            const res = await cloudinary.uploader.upload(__dirname + `/uploads/${image}`, { folder: "circle-pp" });
+            fs.unlinkSync(__dirname + `/uploads/${image}`);
             return res;
         } catch (error) {
             throw error;
@@ -34,10 +34,10 @@ export default new (class CloudinaryConfig {
             const len = image.length;
             for (i; i < len; i++) {
                 files.push(
-                    (await cloudinary.uploader.upload(`src/uploads/${image[i].filename}`, { folder: "circle-pp" }))
+                    (await cloudinary.uploader.upload(__dirname + `/uploads/${image[i].filename}`, { folder: "circle-pp" }))
                         .secure_url
                 ),
-                    fs.unlinkSync(`src/uploads/${image[i].filename}`);
+                    fs.unlinkSync(__dirname + `/uploads/${image[i].filename}`);
             }
             return await Promise.all(files);
         } catch (error) {
