@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  app:
+    image: nubieme/circle:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-5000}:${PORT:-5000}"
