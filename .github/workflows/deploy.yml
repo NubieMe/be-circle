@@ -37,6 +37,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/circle
+            curl -o docker-compose.yml https://raw.githubusercontent.com/NubieMe/be-circle/main/docker-compose.yml
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f
