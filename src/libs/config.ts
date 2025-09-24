@@ -1,0 +1,1 @@
+export const filePath = process.env.ENVIRONMENT === "production" ? "dist/uploads" : "src/uploads";
