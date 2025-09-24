@@ -11,13 +11,15 @@ AppDataSource.initialize()
         const app = express();
 
         app.use(
-            cors({
-                credentials: true,
-                origin: "https://circle-b51.vercel.app",
-                methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-                allowedHeaders: ["Origin", "Content-Type", "Authorization", "Accept"],
-                preflightContinue: true,
-            })
+            cors(
+                // {
+                //     credentials: true,
+                //     origin: "https://circle-b51.vercel.app",
+                //     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+                //     allowedHeaders: ["Origin", "Content-Type", "Authorization", "Accept"],
+                //     preflightContinue: true,
+                // }
+            )
         );
         app.use(express.json());
         cloudinary.config();
