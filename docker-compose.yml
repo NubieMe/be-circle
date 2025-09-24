@@ -7,3 +7,4 @@ services:
       - .env
     ports:
       - "${PORT:-5000}:${PORT:-5000}"
+    command: sh -c "npm run migrate:run && node dist/index.js"

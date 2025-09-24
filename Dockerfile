@@ -23,8 +23,6 @@ RUN npm install --omit=dev
 # Copy compiled code from builder
 COPY --from=builder /app/dist ./dist
 
-RUN npm run migrate:run
-
 EXPOSE ${PORT}
 
 CMD ["npm", "start"]
