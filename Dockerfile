@@ -23,8 +23,7 @@ RUN npm install --omit=dev
 # Copy compiled code from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy .env (opsional, biasanya pakai docker-compose env_file)
-# COPY .env .env
+RUN npm run migrate:run
 
 EXPOSE ${PORT}
 
